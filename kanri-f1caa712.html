@@ -1,0 +1,2354 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>🌿 るみなす 障がい福祉統合管理システム</title>
+  <!-- PWA（ホーム画面インストール）対応 -->
+  <meta name="theme-color" content="#E67E22">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="るみなす">
+  <meta name="robots" content="noindex,nofollow">
+  <link rel="manifest" href='data:application/manifest+json,{"name":"るみなす 統合管理","short_name":"るみなす","display":"standalone","start_url":".","scope":".","theme_color":"%23E67E22","background_color":"%23FFF8F0"}'>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.2/babel.min.js"></script>
+  <style>
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{font-family:'Hiragino Sans','Meiryo','Yu Gothic',sans-serif;background:#FFF8F0;color:#2C3E50}
+    :root{
+      --or:#E67E22;--or2:#D35400;--orl:#F39C12;--orp:#FFF3E0;--orb:#FDEBD0;--cr:#FFF8F0;
+      --tx:#2C3E50;--tl:#7F8C8D;--bd:#E8E8E8;
+      --gn:#27AE60;--rd:#E74C3C;--bl:#3498DB;--pu:#9B59B6;--yw:#F39C12
+    }
+    .app{display:flex;min-height:100vh}
+    .sidebar{width:232px;background:linear-gradient(180deg,#E67E22 0%,#D35400 100%);color:white;
+      display:flex;flex-direction:column;position:fixed;height:100vh;overflow-y:auto;z-index:100}
+    .sidebar-logo{padding:18px 16px;border-bottom:1px solid rgba(255,255,255,.2)}
+    .sidebar-logo h1{font-size:19px;font-weight:700;letter-spacing:.5px}
+    .sidebar-logo p{font-size:10px;opacity:.8;margin-top:2px}
+    .sidebar-nav{padding:10px 0;flex:1}
+    .nav-item{display:flex;align-items:center;gap:9px;padding:10px 14px;cursor:pointer;
+      transition:background .15s;font-size:12.5px;border-left:3px solid transparent}
+    .nav-item:hover{background:rgba(255,255,255,.15)}
+    .nav-item.active{background:rgba(255,255,255,.22);border-left-color:white;font-weight:700}
+    .nav-icon{font-size:15px;width:20px;text-align:center}
+    .sidebar-footer{padding:12px 14px;border-top:1px solid rgba(255,255,255,.2);font-size:10px;opacity:.65}
+    .main{margin-left:232px;flex:1;padding:22px;min-height:100vh}
+    .page-header{margin-bottom:18px}
+    .page-header h2{font-size:21px;font-weight:700}
+    .page-header p{color:var(--tl);font-size:12.5px;margin-top:3px}
+    .card{background:white;border-radius:12px;border:1px solid var(--orb);padding:16px;
+      box-shadow:0 2px 8px rgba(230,126,34,.07)}
+    .card-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:12px;margin-bottom:18px}
+    .stat-card{background:white;border-radius:12px;padding:16px;border:1px solid var(--orb);
+      box-shadow:0 2px 8px rgba(230,126,34,.07)}
+    .stat-label{font-size:11px;color:var(--tl);margin-bottom:5px}
+    .stat-value{font-size:26px;font-weight:700;color:var(--or)}
+    .stat-sub{font-size:11px;color:var(--tl);margin-top:2px}
+    .action-bar{display:flex;justify-content:space-between;align-items:center;
+      margin-bottom:14px;gap:10px;flex-wrap:wrap}
+    .btn{padding:7px 14px;border-radius:7px;border:none;cursor:pointer;font-size:12.5px;
+      font-weight:600;transition:all .15s;font-family:inherit;white-space:nowrap}
+    .btn-primary{background:var(--or);color:white}
+    .btn-primary:hover{background:var(--or2)}
+    .btn-outline{background:white;color:var(--or);border:1.5px solid var(--or)}
+    .btn-outline:hover{background:var(--orp)}
+    .btn-ghost{background:transparent;color:var(--tl)}
+    .btn-ghost:hover{background:#f5f5f5}
+    .btn-danger{background:var(--rd);color:white}
+    .btn-success{background:var(--gn);color:white}
+    .btn-sm{padding:5px 9px;font-size:11.5px}
+    .btn-xs{padding:3px 7px;font-size:11px}
+    .search-input{padding:7px 11px;border-radius:7px;border:1.5px solid var(--orb);
+      font-size:12.5px;background:white;font-family:inherit}
+    .search-input:focus{outline:none;border-color:var(--or)}
+    .table-wrap{overflow-x:auto}
+    table{width:100%;border-collapse:collapse;font-size:12.5px}
+    th{background:#FFF8F0;padding:9px 11px;text-align:left;font-weight:600;
+      border-bottom:2px solid var(--orb);white-space:nowrap}
+    td{padding:9px 11px;border-bottom:1px solid var(--bd);vertical-align:middle}
+    tr:hover td{background:#FFFBF5}
+    .tag{display:inline-block;padding:2px 7px;border-radius:5px;font-size:11px;font-weight:600;
+      background:var(--orp);color:var(--or)}
+    .badge{display:inline-block;padding:2px 7px;border-radius:9px;font-size:11px;font-weight:600}
+    .b-gn{background:#E9F7EF;color:var(--gn)}
+    .b-rd{background:#FDEDEC;color:var(--rd)}
+    .b-or{background:var(--orp);color:var(--or)}
+    .b-bl{background:#EBF5FB;color:var(--bl)}
+    .b-pu{background:#F5EEF8;color:var(--pu)}
+    .b-yw{background:#FEF9E7;color:#B7770D}
+    .b-gy{background:#F5F5F5;color:#777}
+    .notice{padding:9px 13px;border-radius:7px;font-size:12.5px;margin-bottom:10px;border-left:3px solid}
+    .n-info{background:#EBF5FB;border-color:var(--bl);color:#1A5276}
+    .n-warn{background:#FEF9E7;border-color:var(--yw);color:#7D6608}
+    .n-danger{background:#FDEDEC;border-color:var(--rd);color:#922B21}
+    .n-success{background:#E9F7EF;border-color:var(--gn);color:#1E8449}
+    .modal-overlay{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.5);
+      display:flex;align-items:center;justify-content:center;z-index:1000;padding:16px}
+    .modal{background:white;border-radius:14px;padding:22px;max-width:620px;width:100%;
+      max-height:90vh;overflow-y:auto}
+    .modal-hdr{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px}
+    .modal-hdr h3{font-size:16px;font-weight:700}
+    .modal-cls{background:none;border:none;font-size:20px;cursor:pointer;color:#888;line-height:1}
+    .modal-ftr{display:flex;justify-content:flex-end;gap:8px;margin-top:18px;
+      padding-top:14px;border-top:1px solid var(--bd)}
+    .fg{margin-bottom:12px}
+    .fg label{display:block;font-size:11px;font-weight:600;color:var(--tl);margin-bottom:4px}
+    .fc{width:100%;padding:7px 11px;border-radius:7px;border:1.5px solid var(--orb);
+      font-size:12.5px;background:white;font-family:inherit}
+    .fc:focus{outline:none;border-color:var(--or)}
+    .fr2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+    .fr3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}
+    .empty-state{text-align:center;padding:36px 16px;color:var(--tl)}
+    .empty-icon{font-size:38px;margin-bottom:10px}
+    .tabs{display:flex;gap:2px;margin-bottom:14px;border-bottom:2px solid var(--orb)}
+    .tab{padding:7px 14px;cursor:pointer;font-size:12.5px;font-weight:600;color:var(--tl);
+      border-bottom:2px solid transparent;margin-bottom:-2px;transition:color .15s}
+    .tab.active{color:var(--or);border-bottom-color:var(--or)}
+    .care-rec{padding:11px 13px;background:#FAFAFA;border-radius:8px;margin-bottom:9px}
+    .care-rec-hdr{display:flex;justify-content:space-between;align-items:center;margin-bottom:5px}
+    .care-meta{font-size:11px;color:var(--tl)}
+    .pbar{height:7px;background:#eee;border-radius:4px;overflow:hidden}
+    .pfill{height:100%;border-radius:4px;transition:width .3s}
+    .kasan-card{border:1.5px solid var(--orb);border-radius:10px;padding:13px;margin-bottom:9px}
+    .kasan-on{border-color:var(--gn);background:#F8FFF8}
+    .kasan-off{border-color:#ddd;background:#FAFAFA}
+    .kasan-warn{border-color:var(--yw);background:#FFFEF0}
+    .toggle-wrap{display:flex;align-items:center;gap:8px;cursor:pointer}
+    .toggle{width:40px;height:22px;background:#ccc;border-radius:11px;position:relative;
+      cursor:pointer;transition:background .2s;flex-shrink:0}
+    .toggle.ton{background:var(--gn)}
+    .toggle::after{content:'';position:absolute;top:2px;left:2px;width:18px;height:18px;
+      background:white;border-radius:50%;transition:left .2s}
+    .toggle.ton::after{left:20px}
+    .section-title{font-size:14px;font-weight:700;margin-bottom:12px;color:var(--tx)}
+    .divider{height:1px;background:var(--bd);margin:16px 0}
+    .alert-banner{padding:9px 13px;border-radius:7px;font-size:12px;margin-bottom:10px;
+      display:flex;align-items:center;gap:8px}
+    .al-warn{background:#FEF9E7;border:1px solid var(--yw);color:#7D6608}
+    .al-danger{background:#FDEDEC;border:1px solid var(--rd);color:#922B21}
+    .al-success{background:#E9F7EF;border:1px solid var(--gn);color:#1E8449}
+    /* ===== AI アシスタント ===== */
+    .ai-wrap{display:flex;flex-direction:column;height:calc(100vh - 120px);min-height:420px}
+    .ai-quick{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px}
+    .ai-chip{padding:6px 12px;border-radius:18px;border:1.5px solid var(--orb);background:white;
+      color:var(--or);font-size:12px;font-weight:600;cursor:pointer;transition:all .15s;font-family:inherit}
+    .ai-chip:hover{background:var(--orp);border-color:var(--or)}
+    .ai-chip:disabled{opacity:.45;cursor:not-allowed}
+    .ai-msgs{flex:1;overflow-y:auto;padding:6px 2px;display:flex;flex-direction:column;gap:12px}
+    .ai-row{display:flex;gap:9px;max-width:88%}
+    .ai-row.user{align-self:flex-end;flex-direction:row-reverse}
+    .ai-av{width:30px;height:30px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;
+      justify-content:center;font-size:15px}
+    .ai-av.bot{background:linear-gradient(135deg,#E67E22,#D35400);color:white}
+    .ai-av.user{background:#EBF5FB;color:var(--bl)}
+    .ai-bubble{padding:10px 13px;border-radius:12px;font-size:13px;line-height:1.65;white-space:pre-wrap;
+      word-break:break-word}
+    .ai-bubble.bot{background:white;border:1px solid var(--orb);color:var(--tx)}
+    .ai-bubble.user{background:var(--or);color:white}
+    .ai-input-bar{display:flex;gap:8px;margin-top:12px;align-items:flex-end}
+    .ai-input{flex:1;padding:9px 12px;border-radius:10px;border:1.5px solid var(--orb);font-size:13px;
+      font-family:inherit;resize:none;max-height:120px;background:white}
+    .ai-input:focus{outline:none;border-color:var(--or)}
+    .ai-cursor{display:inline-block;width:7px;height:14px;background:var(--or);
+      margin-left:1px;vertical-align:middle;animation:blink 1s step-start infinite}
+    @keyframes blink{50%{opacity:0}}
+    .ai-setup{max-width:560px;margin:0 auto}
+    .ai-bubble .md-h{font-weight:700;font-size:13.5px;margin:6px 0 3px}
+    .ai-bubble ul,.ai-bubble ol{margin:4px 0 4px 20px}
+    .ai-bubble li{margin:2px 0}
+    .ai-bubble code{background:#F4ECE4;padding:1px 5px;border-radius:4px;font-size:12px;
+      font-family:'SFMono-Regular',Consolas,monospace}
+    .ai-bubble.bot strong{color:var(--or2)}
+    .ai-bubble .md-sp{height:6px}
+    /* ===== スマホ対応（840px以下：サイドバーを上部の横スクロールナビに変形） ===== */
+    @media (max-width:840px){
+      .app{flex-direction:column}
+      .sidebar{position:sticky;top:0;width:100%;height:auto;flex-direction:column;overflow:visible}
+      .sidebar-logo{padding:10px 14px}
+      .sidebar-logo p{display:none}
+      .sidebar-nav{display:flex;overflow-x:auto;padding:0 4px;flex:none;-webkit-overflow-scrolling:touch;scrollbar-width:none}
+      .sidebar-nav::-webkit-scrollbar{display:none}
+      .nav-item{flex:0 0 auto;border-left:none;border-bottom:3px solid transparent;padding:9px 10px;font-size:12px;gap:5px}
+      .nav-item.active{border-bottom-color:white}
+      .sidebar-footer{display:flex;align-items:center;gap:8px;padding:8px 14px}
+      .sidebar-footer>div{margin-bottom:0!important;flex:1}
+      .sidebar-footer p{display:none}
+      .main{margin-left:0;padding:12px;min-height:auto}
+      .fr2,.fr3{grid-template-columns:1fr}
+      .card-grid{grid-template-columns:repeat(2,1fr)!important}
+      /* インラインstyleの多カラムgridを1カラム化（スマホでは縦積み） */
+      .main div[style*="grid-template-columns"]{grid-template-columns:1fr!important}
+      .main div[style*="repeat(4"]{grid-template-columns:repeat(2,1fr)!important}
+      .page-header h2{font-size:18px}
+      .modal{padding:14px;max-height:94vh}
+      .ai-wrap{height:calc(100vh - 170px)}
+      .stat-value{font-size:21px}
+      table{font-size:12px}
+      th,td{padding:7px 8px}
+    }
+  </style>
+</head>
+<body>
+<div id="root"></div>
+<script type="text/babel">
+const {useState,useMemo} = React;
+
+// ===== HELPERS =====
+const ls=(k,d)=>{try{const v=localStorage.getItem(k);return v?JSON.parse(v):d}catch{return d}};
+const ss=(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v))}catch{}};
+const today=()=>new Date().toISOString().split('T')[0];
+const genId=()=>Date.now().toString(36)+Math.random().toString(36).substr(2,5);
+const yen=(n)=>'¥'+(Math.floor(n||0)).toLocaleString();
+const initD=(key,def)=>{const ex=ls(key,null);if(!ex){ss(key,def);return def;}return ex;};
+const curM=()=>{const d=new Date();return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0');};
+
+// ===== データのバックアップ／復元 =====
+// localStorage に保存される全データのキー。新しい保存先を追加したらここにも追記すること。
+const DATA_KEYS=['residents','careRecords','staff','shifts','legalUpdates','kasanSettings','accounting','billing','billing_check','ruminasu_contracts','ruminasu_training'];
+const exportAllData=()=>{
+  const dump={_app:'ruminasu',_exportedAt:new Date().toISOString()};
+  DATA_KEYS.forEach(k=>{const v=ls(k,null);if(v!==null)dump[k]=v;});
+  const blob=new Blob([JSON.stringify(dump,null,2)],{type:'application/json'});
+  const url=URL.createObjectURL(blob);const a=document.createElement('a');
+  a.href=url;a.download='るみなす_バックアップ_'+today()+'.json';a.click();URL.revokeObjectURL(url);
+};
+const importAllData=(file)=>{
+  const reader=new FileReader();
+  reader.onload=e=>{
+    try{
+      const data=JSON.parse(e.target.result);
+      const keys=DATA_KEYS.filter(k=>data[k]!==undefined);
+      if(keys.length===0){alert('このファイルには復元できるデータが見つかりませんでした。');return;}
+      if(!window.confirm(`バックアップから ${keys.length} 種類のデータを復元します。\n現在のデータは上書きされます。よろしいですか？`))return;
+      keys.forEach(k=>ss(k,data[k]));
+      alert('復元しました。画面を再読み込みします。');
+      location.reload();
+    }catch(err){alert('復元に失敗しました：'+(err.message||err));}
+  };
+  reader.readAsText(file);
+};
+
+// ===== 加算 DEFINITIONS =====
+const KASAN_DEF={
+  tokuteiJigyosho:{name:'特定事業所加算',services:['居宅介護'],
+    options:[
+      {level:'I',rate:0.20,label:'加算Ⅰ（+20%）',req:['サ責常勤専従配置','月次報告書作成','24時間連絡体制','定期研修実施']},
+      {level:'II',rate:0.10,label:'加算Ⅱ（+10%）',req:['サ責常勤配置','月次報告書作成','定期研修実施']},
+      {level:'III',rate:0.10,label:'加算Ⅲ（+10%）',req:['常勤ヘルパー配置','定期研修実施']},
+      {level:'A',rate:0.03,label:'加算A（+3%）',req:['基本要件充足']},
+      {level:'なし',rate:0,label:'なし',req:[]},
+    ]},
+  taisei:{name:'サービス提供体制強化加算',services:['居宅介護','重度訪問介護'],
+    options:[
+      {level:'I',units:6,label:'加算Ⅰ（+6単位/回）',req:['介護福祉士70%以上']},
+      {level:'II',units:4,label:'加算Ⅱ（+4単位/回）',req:['介護福祉士50%以上']},
+      {level:'III',units:2,label:'加算Ⅲ（+2単位/回）',req:['介護福祉士30%以上']},
+      {level:'なし',units:0,label:'なし',req:[]},
+    ]},
+  shokai:{name:'初回加算',services:['居宅介護'],units:200,desc:'新規利用者の初月に200単位を加算'},
+  // 令和6年度改定で旧3加算（処遇改善・特定処遇改善・ベースアップ等支援）は
+  // 「福祉・介護職員等処遇改善加算」に一本化。さらに【令和8年6月提供分から改定】：
+  // Ⅰ・Ⅱに上位区分「ロ」を新設（従来はイ）・全体の率を引き上げ。
+  // 加算率は「基本サービス費＋各種加算（処遇改善加算を除く）の総単位数」に乗じる。
+  // 料率出典：R8年度報酬改定（カイビズ・介護のコミミの2社で一致確認、2026-07）。
+  // ※令和8年5月提供分まではⅢ=居宅34.7%/重訪27.3%（旧率）。実績報告(R7年度分)は旧率で作成。
+  shogu:{name:'福祉・介護職員等処遇改善加算',services:['居宅介護','重度訪問介護'],
+    serviceRates:{
+      '居宅介護':[
+        {level:'Iロ',rate:0.456,label:'加算Ⅰロ（45.6%）'},{level:'Iイ',rate:0.446,label:'加算Ⅰイ（44.6%）'},
+        {level:'IIロ',rate:0.441,label:'加算Ⅱロ（44.1%）'},{level:'IIイ',rate:0.431,label:'加算Ⅱイ（43.1%）'},
+        {level:'III',rate:0.376,label:'加算Ⅲ（37.6%）'},{level:'IV',rate:0.302,label:'加算Ⅳ（30.2%）'},
+        {level:'なし',rate:0,label:'なし'}],
+      '重度訪問介護':[
+        {level:'Iロ',rate:0.382,label:'加算Ⅰロ（38.2%）'},{level:'Iイ',rate:0.372,label:'加算Ⅰイ（37.2%）'},
+        {level:'IIロ',rate:0.367,label:'加算Ⅱロ（36.7%）'},{level:'IIイ',rate:0.357,label:'加算Ⅱイ（35.7%）'},
+        {level:'III',rate:0.302,label:'加算Ⅲ（30.2%）'},{level:'IV',rate:0.248,label:'加算Ⅳ（24.8%）'},
+        {level:'なし',rate:0,label:'なし'}],
+    },req:['月額賃金改善要件Ⅰ・Ⅱ','キャリアパス要件Ⅰ〜Ⅲ','職場環境等要件','賃金改善計画書・実績報告書の提出']},
+};
+const UNIT_PRICE=10.21;
+
+// ===== 初期データ =====
+// 【個人情報保護】実在の利用者・スタッフ情報はこのファイルに直書きしない。
+// 実データはブラウザ内（localStorage）に保存され、サイドバーの「💾 バックアップ」で
+// JSONに書き出し・「📥 復元」で読み込める。新しい端末では空の状態から開始し、
+// バックアップJSONを復元するか、利用者管理／スタッフ一覧から登録する。
+const INIT_RESIDENTS=[];
+const INIT_STAFF=[];
+const DEFAULT_KASAN={
+  tokuteiJigyosho:{enabled:false,level:'なし'}, // 常勤サ責1名のため未算定（要件＝常勤2名以上）
+  taisei:{enabled:false,level:'なし'},
+  shokai:{enabled:true},
+  shogu:{enabled:true,level:'III'}, // 福祉・介護職員等処遇改善加算Ⅲ（るみなす取得区分）
+};
+// 旧3加算（shoguu/tokutei/base）で保存された設定を新しい一本化形式へ移行する
+const migrateKasan=(k)=>{
+  if(!k||typeof k!=='object')return {...DEFAULT_KASAN};
+  if(k.shogu)return k; // 既に新形式
+  return {
+    tokuteiJigyosho:k.tokuteiJigyosho||{enabled:true,level:'II'},
+    taisei:k.taisei||{enabled:false,level:'なし'},
+    shokai:k.shokai||{enabled:true},
+    shogu:{enabled:k.shoguu?!!k.shoguu.enabled:true,level:'III'},
+  };
+};
+const KK_BILLING=initD('billing',{
+  syncedAt:'—',syncedAtLabel:'未同期（バックアップから復元してください）',
+  transmitStatus:'—',reviewStatus:'—',reviewMonth:'—',
+  officeCode:'',officeName:'るみなす',
+  months:[
+    {label:'サンプル1月',month:'2026-01',totalUnits:0,totalService:0,totalPaid:0,totalCopay:0,residents:[]},
+    {label:'サンプル2月',month:'2026-02',totalUnits:0,totalService:0,totalPaid:0,totalCopay:0,residents:[]},
+  ]
+});
+const SVC_LIST=['居宅介護','重度訪問介護','移動支援'];
+const SUPPORT_LEVELS=['非該当','区分1','区分2','区分3','区分4','区分5','区分6'];
+const COPAY_CLASSES=['生活保護','低所得Ⅰ','低所得Ⅱ','一般1','一般2'];
+const QUALIFS=['介護福祉士','実務者研修修了','初任者研修修了','社会福祉士','精神保健福祉士','普通自動車免許','二種免許'];
+const CARE_CATS=['身体介護','生活援助','通院等介助（身体伴う）','通院等介助（身体伴わない）','重度訪問介護','移動支援','記録・報告','その他'];
+const UNIT_RATES={'居宅介護':263,'重度訪問介護':183,'移動支援':100,'その他':200};
+const DEFAULT_ACCT={
+  '2026-01':{income:{kokuhoren:188533,city:0,copay:0,other:0},expense:{staff:580000,transport:12000,office:19400,training:0,other:5000},openBal:300000},
+  '2026-02':{income:{kokuhoren:846145,city:0,copay:2193,other:0},expense:{staff:600000,transport:15000,office:19400,training:3000,other:5000},openBal:488533},
+  '2026-03':{income:{kokuhoren:0,city:0,copay:0,other:0},expense:{staff:600000,transport:0,office:0,training:0,other:0},openBal:901871},
+};
+
+// ===== 加算計算 =====
+function calcKasan(residents,kasan){
+  return residents.map(res=>{
+    const hrs=parseInt(res.serviceHours)||0;
+    // 居宅介護・重度訪問介護は国保連請求。移動支援は地域生活支援事業（市町村請求）で
+    // 国保連の加算体系・処遇改善加算の対象外のため概算扱いとする。
+    const isKokuho=['居宅介護','重度訪問介護'].includes(res.serviceType);
+    const ur=UNIT_RATES[res.serviceType]||200;
+    const baseU=ur*hrs;
+    let extraU=0;const breakdown={};
+    if(res.serviceType==='居宅介護'&&kasan.tokuteiJigyosho.enabled){
+      const opt=(KASAN_DEF.tokuteiJigyosho.options||[]).find(o=>o.level===kasan.tokuteiJigyosho.level);
+      if(opt&&opt.rate>0){const k=Math.floor(baseU*opt.rate);extraU+=k;breakdown.tokutei=k;}
+    }
+    if(kasan.taisei.enabled&&isKokuho){
+      const opt=(KASAN_DEF.taisei.options||[]).find(o=>o.level===kasan.taisei.level);
+      if(opt&&opt.units>0){const visits=Math.max(1,Math.ceil(hrs/3));const k=opt.units*visits;extraU+=k;breakdown.taisei=k;}
+    }
+    if(kasan.shokai.enabled&&res.serviceType==='居宅介護'&&res.isNew){extraU+=200;breakdown.shokai=200;}
+    // 小計（基本＋各種加算。処遇改善加算を除く総単位数）
+    const subU=baseU+extraU;
+    // 福祉・介護職員等処遇改善加算（一本化）。小計に加算率を乗じる
+    let shoguU=0;
+    if(kasan.shogu&&kasan.shogu.enabled&&isKokuho){
+      const rates=KASAN_DEF.shogu.serviceRates[res.serviceType]||[];
+      const opt=rates.find(o=>o.level===kasan.shogu.level);
+      if(opt&&opt.rate>0){shoguU=Math.floor(subU*opt.rate);breakdown.shogu=shoguU;}
+    }
+    const totalU=subU+shoguU;
+    const totalAmt=Math.floor(totalU*UNIT_PRICE);
+    const copayCalc=Math.floor(totalAmt*0.1);
+    const copay=res.copayLimit>0?Math.min(copayCalc,res.copayLimit):copayCalc;
+    const benefit=totalAmt-copay;
+    return{...res,isKokuho,baseU,extraU,subU,shoguU,totalU,totalAmt,copay,benefit,breakdown};
+  });
+}
+
+// ===== 共通UI =====
+function Modal({title,onClose,children,wide}){
+  return(
+    <div className="modal-overlay" onClick={e=>{if(e.target===e.currentTarget)onClose();}}>
+      <div className="modal" style={{maxWidth:wide?780:620}}>
+        <div className="modal-hdr">
+          <h3>{title}</h3>
+          <button className="modal-cls" onClick={onClose}>×</button>
+        </div>
+        {children}
+      </div>
+    </div>
+  );
+}
+function SupportBadge({level}){
+  const colors={
+    '非該当':{bg:'#F5F5F5',c:'#888'},
+    '区分1':{bg:'#EBF5FB',c:'#2980B9'},'区分2':{bg:'#EBF5FB',c:'#2471A3'},
+    '区分3':{bg:'#FEF9E7',c:'#B7770D'},'区分4':{bg:'#FEF9E7',c:'#9A7D0A'},
+    '区分5':{bg:'#FDEDEC',c:'#C0392B'},'区分6':{bg:'#FDEDEC',c:'#922B21'},
+  };
+  const s=colors[level]||{bg:'#F5F5F5',c:'#888'};
+  return <span className="badge" style={{background:s.bg,color:s.c}}>{level}</span>;
+}
+function SvcBadge({type}){
+  const c={
+    '居宅介護':{bg:'#FFF3E0',c:'#E67E22'},
+    '重度訪問介護':{bg:'#F5EEF8',c:'#9B59B6'},
+    '移動支援':{bg:'#E9F7EF',c:'#27AE60'},
+  };
+  const s=c[type]||{bg:'#F5F5F5',c:'#888'};
+  return <span className="badge" style={{background:s.bg,color:s.c}}>{type}</span>;
+}
+
+// ===== DASHBOARD =====
+function Dashboard({residents,careRecords,staff,legalUpdates,kasan,acct,contracts,training,setPage}){
+  const todayStr=today();
+  const todayRecs=careRecords.filter(r=>r.date===todayStr);
+  const kkRes=calcKasan(residents,kasan);
+  const totalAmt=kkRes.reduce((s,r)=>s+r.totalAmt,0);
+  const totalBenefit=kkRes.reduce((s,r)=>s+r.benefit,0);
+  const certAlerts=residents.filter(r=>{
+    if(!r.certExpiry)return false;
+    const diff=(new Date(r.certExpiry)-new Date())/(1000*60*60*24);
+    return diff<60;
+  });
+  const curMonthData=acct[curM()]||{income:{kokuhoren:0,city:0,copay:0,other:0},expense:{staff:0,transport:0,office:0,training:0,other:0},openBal:0};
+  const totalIncome=Object.values(curMonthData.income).reduce((s,v)=>s+v,0);
+  const totalExpense=Object.values(curMonthData.expense).reduce((s,v)=>s+v,0);
+  const profit=totalIncome-totalExpense;
+  const fuwStaff=staff.filter(s=>s.qualifications&&s.qualifications.includes('介護福祉士'));
+  const kaigofukushiPct=staff.length>0?Math.round(fuwStaff.length/staff.length*100):0;
+  // 契約・研修（更新期限30日以内または超過／今月予定日の研修）
+  const contractDue=(contracts||[]).filter(c=>{
+    if(!c.renewalDate)return false;
+    const d=(new Date(c.renewalDate)-new Date())/(1000*60*60*24);
+    return !isNaN(d)&&d<30;
+  }).length;
+  const trainingThisMonth=(training||[]).filter(t=>t.plannedDate&&t.plannedDate.startsWith(curM())).length;
+  return(
+    <div>
+      <div className="page-header">
+        <h2>🏡 ダッシュボード</h2>
+        <p>{new Date().toLocaleDateString('ja-JP',{year:'numeric',month:'long',day:'numeric',weekday:'long'})}</p>
+      </div>
+      <div className="notice n-success" style={{marginBottom:16}}>
+        ✅ 登録中の利用者 <strong>{residents.length}名</strong>・スタッフ <strong>{staff.length}名</strong> ／ かんたん介護 最終同期：{KK_BILLING.syncedAtLabel}
+      </div>
+      {certAlerts.length>0&&(
+        <div className="notice n-warn" style={{marginBottom:16}}>
+          ⚠️ 受給者証の有効期限が60日以内の利用者：{certAlerts.map(r=>r.name).join('、')}
+        </div>
+      )}
+      <div className="card-grid" style={{gridTemplateColumns:'repeat(auto-fill,minmax(150px,1fr))'}}>
+        <div className="stat-card"><div className="stat-label">👤 利用者数</div><div className="stat-value">{residents.length}</div><div className="stat-sub">名（かんたん介護連携）</div></div>
+        <div className="stat-card"><div className="stat-label">👥 スタッフ数</div><div className="stat-value">{staff.length}</div><div className="stat-sub">名（内常勤{staff.filter(s=>s.employment==='常勤').length}名）</div></div>
+        <div className="stat-card"><div className="stat-label">📝 本日のケア記録</div><div className="stat-value">{todayRecs.length}</div><div className="stat-sub">件</div></div>
+        <div className="stat-card"><div className="stat-label">⚡ 月間概算請求</div><div className="stat-value" style={{fontSize:18}}>{yen(totalBenefit)}</div><div className="stat-sub">給付費（加算込み）</div></div>
+        <div className="stat-card"><div className="stat-label">💰 当月損益</div><div className="stat-value" style={{fontSize:18,color:profit>=0?'var(--gn)':'var(--rd)'}}>{yen(profit)}</div><div className="stat-sub">{profit>=0?'黒字':'赤字'}</div></div>
+        <div className="stat-card"><div className="stat-label">🏛️ 審査状況</div><div className="stat-value" style={{fontSize:16}}>{KK_BILLING.reviewStatus}</div><div className="stat-sub">{KK_BILLING.reviewMonth}</div></div>
+        <div className="stat-card" style={{cursor:'pointer'}} onClick={()=>setPage('contract')}><div className="stat-label">📜 更新期限が近い契約</div><div className="stat-value" style={{color:contractDue>0?'var(--rd)':'var(--gn)'}}>{contractDue}</div><div className="stat-sub">件（30日以内・超過）</div></div>
+        <div className="stat-card" style={{cursor:'pointer'}} onClick={()=>setPage('contract')}><div className="stat-label">📚 今月の研修予定</div><div className="stat-value">{trainingThisMonth}</div><div className="stat-sub">件（予定日が今月）</div></div>
+      </div>
+      <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:16,marginBottom:18}}>
+        <div className="card" style={{borderLeft:'4px solid var(--or)'}}>
+          <div className="section-title">📡 かんたん介護 請求連携</div>
+          <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:10,marginBottom:12}}>
+            {[
+              {label:'伝送状況',val:KK_BILLING.transmitStatus,c:'var(--gn)'},
+              {label:'審査状況',val:KK_BILLING.reviewStatus,c:'var(--yw)'},
+              {label:'2月給付費',val:yen(KK_BILLING.months[1].totalPaid),c:'var(--bl)'},
+              {label:'最終同期',val:'R8/3/4 16:13',c:'var(--pu)'},
+            ].map((s,i)=>(
+              <div key={i} style={{background:'#FAFAFA',borderRadius:8,padding:'9px 11px'}}>
+                <div style={{fontSize:11,color:'#888',marginBottom:3}}>{s.label}</div>
+                <div style={{fontWeight:700,fontSize:13,color:s.c}}>{s.val}</div>
+              </div>
+            ))}
+          </div>
+          <a href="https://www.kantankaigo.jp/home/seikyuus" target="_blank" rel="noreferrer">
+            <button className="btn btn-outline btn-sm">📋 請求ページを開く →</button>
+          </a>
+        </div>
+        <div className="card" style={{borderLeft:'4px solid var(--pu)'}}>
+          <div className="section-title">⚡ 加算取得状況</div>
+          {[
+            {key:'shogu',label:'処遇改善加算（一本化）',active:kasan.shogu.enabled,lv:'加算'+kasan.shogu.level},
+            {key:'tokuteiJigyosho',label:'特定事業所加算',active:kasan.tokuteiJigyosho.enabled,lv:'加算'+kasan.tokuteiJigyosho.level},
+            {key:'taisei',label:'体制強化加算',active:kasan.taisei.enabled,lv:'加算'+kasan.taisei.level},
+            {key:'shokai',label:'初回加算',active:kasan.shokai.enabled,lv:'200単位/月'},
+          ].map(k=>(
+            <div key={k.key} style={{display:'flex',alignItems:'center',justifyContent:'space-between',padding:'5px 0',borderBottom:'1px solid #f0f0f0'}}>
+              <span style={{fontSize:12,color:k.active?'var(--tx)':'#aaa'}}>{k.label}</span>
+              <span className={k.active?'badge b-gn':'badge b-gy'}>{k.active?'✅ '+k.lv:'未取得'}</span>
+            </div>
+          ))}
+          <button className="btn btn-outline btn-sm" style={{marginTop:10}} onClick={()=>setPage('kasan')}>⚙️ 加算設定を変更 →</button>
+        </div>
+      </div>
+      <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:16}}>
+        <div className="card">
+          <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:12}}>
+            <div className="section-title" style={{margin:0}}>💰 当月経理サマリー（{curM().replace('-','年')}月）</div>
+            <button className="btn btn-ghost btn-sm" onClick={()=>setPage('accounting')}>詳細 →</button>
+          </div>
+          {[
+            {label:'国保連給付費収入',val:curMonthData.income.kokuhoren,c:'var(--gn)'},
+            {label:'人件費',val:curMonthData.expense.staff,c:'var(--rd)'},
+            {label:'その他支出',val:curMonthData.expense.transport+curMonthData.expense.office+curMonthData.expense.training+curMonthData.expense.other,c:'var(--rd)'},
+          ].map((item,i)=>(
+            <div key={i} style={{display:'flex',justifyContent:'space-between',padding:'6px 0',borderBottom:'1px solid #f0f0f0'}}>
+              <span style={{fontSize:12.5}}>{item.label}</span>
+              <span style={{fontWeight:700,color:item.c,fontSize:13}}>{yen(item.val)}</span>
+            </div>
+          ))}
+          <div style={{display:'flex',justifyContent:'space-between',padding:'8px 0',marginTop:4,borderTop:'2px solid var(--or)'}}>
+            <span style={{fontWeight:700,fontSize:13}}>当月損益</span>
+            <span style={{fontWeight:700,fontSize:14,color:profit>=0?'var(--gn)':'var(--rd)'}}>{yen(profit)}</span>
+          </div>
+        </div>
+        <div className="card">
+          <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:12}}>
+            <div className="section-title" style={{margin:0}}>📢 法令・制度 最新情報</div>
+            <button className="btn btn-ghost btn-sm" onClick={()=>setPage('legal')}>全て →</button>
+          </div>
+          {legalUpdates.length===0
+            ?<p style={{fontSize:12.5,color:'#aaa'}}>更新情報がありません</p>
+            :[...legalUpdates].sort((a,b)=>b.date.localeCompare(a.date)).slice(0,4).map(u=>(
+              <div key={u.id} className={`notice n-${u.type}`} style={{marginBottom:7,padding:'7px 11px'}}>
+                <div style={{fontWeight:700,fontSize:12.5}}>{u.title}</div>
+                <div style={{fontSize:11,marginTop:2,opacity:.75}}>{u.date}{u.source&&` ／ ${u.source}`}</div>
+              </div>
+            ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ===== 利用者管理 =====
+function Residents({residents,setResidents}){
+  const [search,setSearch]=useState('');
+  const [modal,setModal]=useState(false);
+  const [edit,setEdit]=useState(null);
+  const EMPTY={id:'',name:'',kana:'',gender:'male',dob:'',age:'',supportLevel:'区分1',serviceType:'居宅介護',serviceHours:0,entryDate:today(),address:'',certNo:'',certExpiry:'',copayLimit:0,copayClass:'低所得Ⅱ',emergency:'',emergencyRel:'',emergencyPhone:'',notes:'',isNew:false};
+  const [form,setForm]=useState(EMPTY);
+  const setF=(k,v)=>setForm(f=>({...f,[k]:v}));
+  const filtered=residents.filter(r=>r.name.includes(search)||r.kana.includes(search)||(r.serviceType||'').includes(search));
+  const openAdd=()=>{setForm(EMPTY);setEdit(null);setModal(true);};
+  const openEdit=(r)=>{setForm({...r});setEdit(r.id);setModal(true);};
+  const handleSave=()=>{
+    if(!form.name.trim())return alert('利用者名を入力してください');
+    let updated;
+    if(edit){updated=residents.map(r=>r.id===edit?{...form}:r);}
+    else{updated=[...residents,{...form,id:genId(),importedFrom:'manual'}];}
+    setResidents(updated);ss('residents',updated);setModal(false);
+  };
+  const handleDel=(id)=>{if(!window.confirm('削除しますか？'))return;const u=residents.filter(r=>r.id!==id);setResidents(u);ss('residents',u);};
+  const certWarning=(expiry)=>{
+    if(!expiry)return null;
+    const d=(new Date(expiry)-new Date())/(1000*60*60*24);
+    if(d<0)return'expired';if(d<30)return'danger';if(d<60)return'warn';return null;
+  };
+  return(
+    <div>
+      <div className="page-header">
+        <h2>👤 利用者管理</h2>
+        <p>受給者証・支給量・サービス種別を一元管理します</p>
+      </div>
+      <div className="action-bar">
+        <input className="search-input" placeholder="🔍 名前・かな・サービス種別で検索" value={search} onChange={e=>setSearch(e.target.value)} style={{minWidth:260}}/>
+        <button className="btn btn-primary" onClick={openAdd}>＋ 利用者を追加</button>
+      </div>
+      <div className="card">
+        <div className="table-wrap">
+          <table>
+            <thead><tr><th>利用者名</th><th>障害支援区分</th><th>サービス種別</th><th>月間支給量</th><th>受給者証番号</th><th>有効期限</th><th>利用者負担</th><th>緊急連絡先</th><th>操作</th></tr></thead>
+            <tbody>
+              {filtered.length===0?<tr><td colSpan={9}><div className="empty-state"><div className="empty-icon">👤</div><p>利用者がいません</p></div></td></tr>
+              :filtered.map(r=>{
+                const cw=certWarning(r.certExpiry);
+                return(
+                  <tr key={r.id}>
+                    <td>
+                      <div style={{fontWeight:700}}>{r.name}</div>
+                      <div style={{fontSize:11,color:'#888'}}>{r.kana}</div>
+                      {r.isNew&&<span className="badge b-bl" style={{fontSize:10}}>新規</span>}
+                    </td>
+                    <td><SupportBadge level={r.supportLevel||'非該当'}/></td>
+                    <td><SvcBadge type={r.serviceType}/></td>
+                    <td style={{fontWeight:600}}>{r.serviceHours}時間</td>
+                    <td style={{fontSize:12}}>{r.certNo||'—'}</td>
+                    <td>
+                      {r.certExpiry?(
+                        <span style={{color:cw==='expired'?'var(--rd)':cw==='danger'?'var(--rd)':cw==='warn'?'#B7770D':'var(--gn)',fontWeight:cw?700:400,fontSize:12}}>
+                          {r.certExpiry}{cw==='expired'?' ⚠️期限切れ':cw==='danger'?' ⚠️30日以内':cw==='warn'?' ⚠️60日以内':''}
+                        </span>
+                      ):'—'}
+                    </td>
+                    <td style={{fontSize:12}}>{r.copayLimit>0?yen(r.copayLimit)+'上限':'負担なし'} <span style={{fontSize:10,color:'#888'}}>({r.copayClass})</span></td>
+                    <td style={{fontSize:12}}>{r.emergency&&`${r.emergency}（${r.emergencyRel}）`}{r.emergencyPhone&&<div style={{fontSize:11,color:'#888'}}>{r.emergencyPhone}</div>}</td>
+                    <td>
+                      <div style={{display:'flex',gap:5}}>
+                        <button className="btn btn-outline btn-xs" onClick={()=>openEdit(r)}>編集</button>
+                        <button className="btn btn-ghost btn-xs" style={{color:'var(--rd)'}} onClick={()=>handleDel(r.id)}>削除</button>
+                      </div>
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
+      </div>
+      {modal&&(
+        <Modal title={edit?'利用者情報を編集':'新規利用者を追加'} onClose={()=>setModal(false)} wide>
+          <div className="fr2">
+            <div className="fg"><label>利用者名 *</label><input className="fc" value={form.name} onChange={e=>setF('name',e.target.value)} placeholder="例：山田 太郎"/></div>
+            <div className="fg"><label>ふりがな</label><input className="fc" value={form.kana} onChange={e=>setF('kana',e.target.value)} placeholder="例：ヤマダ タロウ"/></div>
+          </div>
+          <div className="fr3">
+            <div className="fg"><label>性別</label><select className="fc" value={form.gender} onChange={e=>setF('gender',e.target.value)}><option value="male">男性</option><option value="female">女性</option></select></div>
+            <div className="fg"><label>生年月日</label><input type="date" className="fc" value={form.dob} onChange={e=>setF('dob',e.target.value)}/></div>
+            <div className="fg"><label>年齢</label><input className="fc" type="number" value={form.age} onChange={e=>setF('age',e.target.value)}/></div>
+          </div>
+          <div className="fr3">
+            <div className="fg"><label>障害支援区分</label><select className="fc" value={form.supportLevel} onChange={e=>setF('supportLevel',e.target.value)}>{SUPPORT_LEVELS.map(l=><option key={l}>{l}</option>)}</select></div>
+            <div className="fg"><label>サービス種別</label><select className="fc" value={form.serviceType} onChange={e=>setF('serviceType',e.target.value)}>{SVC_LIST.map(s=><option key={s}>{s}</option>)}</select></div>
+            <div className="fg"><label>月間支給量（時間）</label><input type="number" className="fc" value={form.serviceHours} onChange={e=>setF('serviceHours',parseInt(e.target.value)||0)}/></div>
+          </div>
+          <div className="fr2">
+            <div className="fg"><label>受給者証番号</label><input className="fc" value={form.certNo} onChange={e=>setF('certNo',e.target.value)}/></div>
+            <div className="fg"><label>受給者証有効期限</label><input type="date" className="fc" value={form.certExpiry} onChange={e=>setF('certExpiry',e.target.value)}/></div>
+          </div>
+          <div className="fr3">
+            <div className="fg"><label>所得区分</label><select className="fc" value={form.copayClass} onChange={e=>setF('copayClass',e.target.value)}>{COPAY_CLASSES.map(c=><option key={c}>{c}</option>)}</select></div>
+            <div className="fg"><label>上限額（円）</label><input type="number" className="fc" value={form.copayLimit} onChange={e=>setF('copayLimit',parseInt(e.target.value)||0)}/></div>
+            <div className="fg"><label>利用開始日</label><input type="date" className="fc" value={form.entryDate} onChange={e=>setF('entryDate',e.target.value)}/></div>
+          </div>
+          <div className="fg"><label>住所</label><input className="fc" value={form.address} onChange={e=>setF('address',e.target.value)}/></div>
+          <div className="fr3">
+            <div className="fg"><label>緊急連絡先氏名</label><input className="fc" value={form.emergency} onChange={e=>setF('emergency',e.target.value)}/></div>
+            <div className="fg"><label>続柄</label><input className="fc" value={form.emergencyRel} onChange={e=>setF('emergencyRel',e.target.value)}/></div>
+            <div className="fg"><label>連絡先電話番号</label><input className="fc" value={form.emergencyPhone} onChange={e=>setF('emergencyPhone',e.target.value)}/></div>
+          </div>
+          <div className="fr2">
+            <div className="fg"><label>備考</label><textarea className="fc" rows={2} value={form.notes} onChange={e=>setF('notes',e.target.value)}/></div>
+            <div className="fg" style={{alignSelf:'center'}}>
+              <label style={{display:'flex',alignItems:'center',gap:8,cursor:'pointer'}}>
+                <input type="checkbox" checked={!!form.isNew} onChange={e=>setF('isNew',e.target.checked)}/>
+                新規利用者（初回加算の対象）
+              </label>
+            </div>
+          </div>
+          <div className="modal-ftr">
+            <button className="btn btn-ghost" onClick={()=>setModal(false)}>キャンセル</button>
+            <button className="btn btn-primary" onClick={handleSave}>💾 保存する</button>
+          </div>
+        </Modal>
+      )}
+    </div>
+  );
+}
+
+// ===== ケア記録 =====
+function CareRecords({residents,careRecords,setCareRecords,staff}){
+  const [date,setDate]=useState(today());
+  const [modal,setModal]=useState(false);
+  const [edit,setEdit]=useState(null);
+  const EMPTY={id:'',date:today(),residentId:'',residentName:'',serviceType:'居宅介護',category:'身体介護',startTime:'09:00',endTime:'11:00',staffId:'',staffName:'',content:'',isFirstVisit:false,copayAmount:0,notes:''};
+  const [form,setForm]=useState(EMPTY);
+  const setF=(k,v)=>setForm(f=>({...f,[k]:v}));
+  const dayRecs=careRecords.filter(r=>r.date===date);
+  const openAdd=()=>{setForm({...EMPTY,date});setEdit(null);setModal(true);};
+  const openEdit=(r)=>{setForm({...r});setEdit(r.id);setModal(true);};
+  const handleSave=()=>{
+    if(!form.residentId||!form.content.trim())return alert('利用者と内容は必須です');
+    const res=residents.find(r=>r.id===form.residentId);
+    const st=staff.find(s=>s.id===form.staffId);
+    const rec={...form,residentName:res?res.name:form.residentName,staffName:st?st.name:form.staffName,id:edit||genId()};
+    let updated;
+    if(edit){updated=careRecords.map(r=>r.id===edit?rec:r);}
+    else{updated=[...careRecords,rec];}
+    setCareRecords(updated);ss('careRecords',updated);setModal(false);
+  };
+  const handleDel=(id)=>{if(!window.confirm('削除しますか？'))return;const u=careRecords.filter(r=>r.id!==id);setCareRecords(u);ss('careRecords',u);};
+  const monthStart=date.substr(0,7)+'-01';
+  const monthEnd=new Date(parseInt(date.substr(0,4)),parseInt(date.substr(5,2)),0).toISOString().split('T')[0];
+  const monthRecs=careRecords.filter(r=>r.date>=monthStart&&r.date<=monthEnd);
+  const resMonthCounts=residents.map(r=>({...r,cnt:monthRecs.filter(m=>m.residentId===r.id).length}));
+  return(
+    <div>
+      <div className="page-header">
+        <h2>📝 ケア記録・実績管理</h2>
+        <p>日次ケア記録を入力し、月次実績として国保連請求に連携します</p>
+      </div>
+      <div className="action-bar">
+        <div style={{display:'flex',alignItems:'center',gap:10}}>
+          <input type="date" className="search-input" value={date} onChange={e=>setDate(e.target.value)}/>
+          <span style={{fontSize:13,fontWeight:600}}>{date.replace(/-/g,'/')} のケア記録（{dayRecs.length}件）</span>
+        </div>
+        <button className="btn btn-primary" onClick={openAdd}>＋ ケア記録を追加</button>
+      </div>
+      <div style={{display:'grid',gridTemplateColumns:'1fr 320px',gap:16}}>
+        <div className="card">
+          {dayRecs.length===0
+            ?<div className="empty-state"><div className="empty-icon">📝</div><p>この日のケア記録はありません</p></div>
+            :dayRecs.sort((a,b)=>a.startTime.localeCompare(b.startTime)).map(r=>(
+              <div key={r.id} className="care-rec">
+                <div className="care-rec-hdr">
+                  <div style={{display:'flex',alignItems:'center',gap:7}}>
+                    <span style={{fontWeight:700,fontSize:13.5}}>{r.residentName}</span>
+                    <SvcBadge type={r.serviceType}/>
+                    <span className="badge b-gy" style={{fontSize:10}}>{r.category}</span>
+                    {r.isFirstVisit&&<span className="badge b-bl" style={{fontSize:10}}>初回加算</span>}
+                  </div>
+                  <div style={{display:'flex',gap:5}}>
+                    <button className="btn btn-outline btn-xs" onClick={()=>openEdit(r)}>編集</button>
+                    <button className="btn btn-ghost btn-xs" style={{color:'var(--rd)'}} onClick={()=>handleDel(r.id)}>削除</button>
+                  </div>
+                </div>
+                <div className="care-meta" style={{marginBottom:6}}>
+                  {r.startTime&&r.endTime&&`${r.startTime}〜${r.endTime}`}{r.staffName&&` ／ 担当：${r.staffName}`}
+                </div>
+                <p style={{fontSize:13,lineHeight:1.6,color:'#333'}}>{r.content}</p>
+                {r.notes&&<p style={{fontSize:11.5,color:'var(--tl)',marginTop:4}}>{r.notes}</p>}
+              </div>
+            ))}
+        </div>
+        <div>
+          <div className="card" style={{marginBottom:12}}>
+            <div className="section-title">{date.substr(0,7).replace('-','年')}月 実績サマリー</div>
+            {resMonthCounts.map(r=>(
+              <div key={r.id} style={{display:'flex',justifyContent:'space-between',alignItems:'center',padding:'5px 0',borderBottom:'1px solid #f5f5f5'}}>
+                <span style={{fontSize:12.5}}>{r.name}</span>
+                <span style={{fontWeight:600,fontSize:12.5,color:r.cnt===0?'var(--rd)':'var(--gn)'}}>{r.cnt}件 {r.cnt===0?'⚠️':'✅'}</span>
+              </div>
+            ))}
+          </div>
+          <div className="card">
+            <div className="section-title">📊 月間合計</div>
+            <div style={{fontSize:13,marginBottom:5}}>記録件数 <strong>{monthRecs.length}件</strong></div>
+            <div style={{fontSize:13,marginBottom:5}}>初回加算対象 <strong>{monthRecs.filter(r=>r.isFirstVisit).length}件</strong></div>
+            <div style={{fontSize:11.5,color:'#888'}}>※ 実績から請求データを生成するには「月次請求」ページへ</div>
+            <button className="btn btn-outline btn-sm" style={{marginTop:10,width:'100%'}}>月次請求へ →</button>
+          </div>
+        </div>
+      </div>
+      {modal&&(
+        <Modal title={edit?'ケア記録を編集':'ケア記録を追加'} onClose={()=>setModal(false)}>
+          <div className="fr2">
+            <div className="fg"><label>日付 *</label><input type="date" className="fc" value={form.date} onChange={e=>setF('date',e.target.value)}/></div>
+            <div className="fg"><label>利用者 *</label>
+              <select className="fc" value={form.residentId} onChange={e=>{const res=residents.find(r=>r.id===e.target.value);setForm(f=>({...f,residentId:e.target.value,serviceType:res?res.serviceType:f.serviceType}));}}>
+                <option value="">選択してください</option>
+                {residents.map(r=><option key={r.id} value={r.id}>{r.name}</option>)}
+              </select>
+            </div>
+          </div>
+          <div className="fr2">
+            <div className="fg"><label>サービス種別</label><select className="fc" value={form.serviceType} onChange={e=>setF('serviceType',e.target.value)}>{SVC_LIST.map(s=><option key={s}>{s}</option>)}</select></div>
+            <div className="fg"><label>カテゴリ</label><select className="fc" value={form.category} onChange={e=>setF('category',e.target.value)}>{CARE_CATS.map(c=><option key={c}>{c}</option>)}</select></div>
+          </div>
+          <div className="fr3">
+            <div className="fg"><label>開始時刻</label><input type="time" className="fc" value={form.startTime} onChange={e=>setF('startTime',e.target.value)}/></div>
+            <div className="fg"><label>終了時刻</label><input type="time" className="fc" value={form.endTime} onChange={e=>setF('endTime',e.target.value)}/></div>
+            <div className="fg"><label>担当スタッフ</label>
+              <select className="fc" value={form.staffId} onChange={e=>setF('staffId',e.target.value)}>
+                <option value="">選択</option>
+                {staff.map(s=><option key={s.id} value={s.id}>{s.name}</option>)}
+              </select>
+            </div>
+          </div>
+          <div className="fg"><label>内容 *</label><textarea className="fc" rows={3} value={form.content} onChange={e=>setF('content',e.target.value)} placeholder="ケア内容を記録してください"/></div>
+          <div className="fg"><label>特記事項</label><textarea className="fc" rows={2} value={form.notes} onChange={e=>setF('notes',e.target.value)}/></div>
+          <div className="fg">
+            <label style={{display:'flex',alignItems:'center',gap:8,cursor:'pointer'}}>
+              <input type="checkbox" checked={!!form.isFirstVisit} onChange={e=>setF('isFirstVisit',e.target.checked)}/>
+              初回加算対象（新規利用者の初月のみ）
+            </label>
+          </div>
+          <div className="modal-ftr">
+            <button className="btn btn-ghost" onClick={()=>setModal(false)}>キャンセル</button>
+            <button className="btn btn-primary" onClick={handleSave}>💾 保存する</button>
+          </div>
+        </Modal>
+      )}
+    </div>
+  );
+}
+
+// ===== シフト・勤怠管理 =====
+function StaffShifts({staff,setStaff,shifts,setShifts}){
+  const [month,setMonth]=useState(curM());
+  const [modal,setModal]=useState(false);
+  const [edit,setEdit]=useState(null);
+  const [staffModal,setStaffModal]=useState(false);
+  const [editStaff,setEditStaff]=useState(null);
+  const SEMPTY={id:'',staffId:'',date:today(),startTime:'09:00',endTime:'17:00',breakMin:60,notes:''};
+  const [form,setForm]=useState(SEMPTY);
+  const setF=(k,v)=>setForm(f=>({...f,[k]:v}));
+  const STEMPTY={id:'',name:'',kana:'',role:'ヘルパー（常勤）',employment:'常勤',qualifications:[],monthlySalary:0,hourlyWage:1200,weeklyHours:40,joinDate:today()};
+  const [sform,setSform]=useState(STEMPTY);
+  const setSF=(k,v)=>setSform(f=>({...f,[k]:v}));
+  const mShifts=shifts.filter(s=>s.date&&s.date.startsWith(month));
+  // 終了時刻が開始より前なら翌日にまたがる夜勤として扱う（例：22:00〜翌7:00）
+  const calcHours=(start,end,brk)=>{
+    const [sh,sm]=start.split(':').map(Number);const [eh,em]=end.split(':').map(Number);
+    let total=(eh*60+em)-(sh*60+sm);if(total<0)total+=1440;
+    return Math.max(0,(total-(brk||0))/60);
+  };
+  const calcNightHours=(start,end)=>{
+    const [sh,sm]=start.split(':').map(Number);const [eh,em]=end.split(':').map(Number);
+    const startMin=sh*60+sm;let endMin=eh*60+em;if(endMin<=startMin)endMin+=1440;
+    let night=0;
+    // 22:00〜翌5:00を深夜とする。日跨ぎ・複数日にも対応（分単位で判定）
+    for(let i=startMin;i<endMin;i++){const h=Math.floor(i/60)%24;if(h>=22||h<5)night++;}
+    return night/60;
+  };
+  const staffStats=staff.map(s=>{
+    const ss2=mShifts.filter(sh=>sh.staffId===s.id);
+    const totalH=ss2.reduce((sum,sh)=>sum+calcHours(sh.startTime,sh.endTime,sh.breakMin),0);
+    const nightH=ss2.reduce((sum,sh)=>sum+calcNightHours(sh.startTime,sh.endTime),0);
+    const legalH=s.employment==='常勤'?160:s.weeklyHours*4.3;
+    const otH=Math.max(0,totalH-legalH);
+    const basePay=s.employment==='常勤'?(s.monthlySalary||0):((s.hourlyWage||0)*totalH);
+    const otPay=s.employment==='非常勤'?(s.hourlyWage||0)*otH*0.25:0;
+    const nightPay=(s.employment==='非常勤'?(s.hourlyWage||0):Math.floor((s.monthlySalary||0)/160))*nightH*0.25;
+    return{...s,totalH,nightH,otH,basePay,otPay,nightPay,totalPay:basePay+otPay+nightPay,shiftCount:ss2.length,warn:otH>45};
+  });
+  const dangerStaff=staffStats.filter(s=>s.warn);
+  const saveShift=()=>{
+    if(!form.staffId||!form.date)return alert('スタッフと日付は必須です');
+    const h=calcHours(form.startTime,form.endTime,form.breakMin);
+    const rec={...form,id:edit||genId(),totalH:h};
+    const updated=edit?shifts.map(s=>s.id===edit?rec:s):[...shifts,rec];
+    setShifts(updated);ss('shifts',updated);setModal(false);
+  };
+  const delShift=(id)=>{if(!window.confirm('削除しますか？'))return;const u=shifts.filter(s=>s.id!==id);setShifts(u);ss('shifts',u);};
+  const saveStaff=()=>{
+    if(!sform.name.trim())return alert('スタッフ名を入力してください');
+    const rec={...sform,id:editStaff||genId()};
+    const updated=editStaff?staff.map(s=>s.id===editStaff?rec:s):[...staff,rec];
+    setStaff(updated);ss('staff',updated);setStaffModal(false);
+  };
+  const delStaff=(id)=>{if(!window.confirm('削除しますか？'))return;const u=staff.filter(s=>s.id!==id);setStaff(u);ss('staff',u);};
+  const [activeTab,setActiveTab]=useState('shift');
+  return(
+    <div>
+      <div className="page-header">
+        <h2>👥 シフト・勤怠管理</h2>
+        <p>月間シフト管理・労働基準法準拠チェック・給与計算をサポートします</p>
+      </div>
+      {dangerStaff.length>0&&(
+        <div className="alert-banner al-danger" style={{marginBottom:14}}>
+          ⚠️ 36協定上限（月45時間）超過の可能性：{dangerStaff.map(s=>s.name).join('、')}
+        </div>
+      )}
+      <div className="tabs">
+        {[['shift','📅 シフト管理'],['labor','⚖️ 勤怠・給与'],['stafflist','👤 スタッフ一覧']].map(([id,label])=>(
+          <div key={id} className={`tab${activeTab===id?' active':''}`} onClick={()=>setActiveTab(id)}>{label}</div>
+        ))}
+      </div>
+      {activeTab==='shift'&&(
+        <div>
+          <div className="action-bar">
+            <div style={{display:'flex',alignItems:'center',gap:10}}>
+              <input type="month" className="search-input" value={month} onChange={e=>setMonth(e.target.value)}/>
+              <span style={{fontSize:13,fontWeight:600}}>{mShifts.length}件のシフト</span>
+            </div>
+            <button className="btn btn-primary" onClick={()=>{setForm(SEMPTY);setEdit(null);setModal(true);}}>＋ シフトを追加</button>
+          </div>
+          <div className="card">
+            <div className="table-wrap">
+              <table>
+                <thead><tr><th>日付</th><th>スタッフ</th><th>開始</th><th>終了</th><th>休憩</th><th>実働時間</th><th>深夜時間</th><th>備考</th><th>操作</th></tr></thead>
+                <tbody>
+                  {mShifts.length===0?<tr><td colSpan={9}><div className="empty-state"><p>シフトがありません</p></div></td></tr>
+                  :mShifts.sort((a,b)=>a.date.localeCompare(b.date)).map(s=>{
+                    const st=staff.find(f=>f.id===s.staffId);
+                    const h=calcHours(s.startTime,s.endTime,s.breakMin);
+                    const nh=calcNightHours(s.startTime,s.endTime);
+                    return(
+                      <tr key={s.id}>
+                        <td style={{fontWeight:600}}>{s.date}</td>
+                        <td>{st?st.name:'—'} {st&&<span className="badge b-gy" style={{fontSize:10}}>{st.employment}</span>}</td>
+                        <td>{s.startTime}</td><td>{s.endTime}</td>
+                        <td>{s.breakMin}分</td>
+                        <td style={{fontWeight:600,color:h>8?'var(--rd)':'inherit'}}>{h.toFixed(1)}h{h>8&&' ⚠️'}</td>
+                        <td style={{color:nh>0?'var(--pu)':'inherit'}}>{nh>0?nh.toFixed(1)+'h':'—'}</td>
+                        <td style={{fontSize:12}}>{s.notes}</td>
+                        <td><div style={{display:'flex',gap:5}}>
+                          <button className="btn btn-outline btn-xs" onClick={()=>{setForm({...s});setEdit(s.id);setModal(true);}}>編集</button>
+                          <button className="btn btn-ghost btn-xs" style={{color:'var(--rd)'}} onClick={()=>delShift(s.id)}>削除</button>
+                        </div></td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      )}
+      {activeTab==='labor'&&(
+        <div className="card">
+          <div className="section-title">⚖️ {month.replace('-','年')}月 勤怠・給与サマリー（労働基準法準拠チェック）</div>
+          <div className="table-wrap">
+            <table>
+              <thead><tr><th>スタッフ</th><th>雇用形態</th><th>月間労働時間</th><th>うち深夜</th><th>時間外（超過分）</th><th>基本給</th><th>時間外手当</th><th>深夜手当</th><th>概算総支給</th><th>ステータス</th></tr></thead>
+              <tbody>
+                {staffStats.map(s=>(
+                  <tr key={s.id}>
+                    <td style={{fontWeight:700}}>{s.name}</td>
+                    <td><span className="badge b-gy">{s.employment}</span></td>
+                    <td style={{fontWeight:600}}>{s.totalH.toFixed(1)}h</td>
+                    <td style={{color:'var(--pu)'}}>{s.nightH>0?s.nightH.toFixed(1)+'h':'—'}</td>
+                    <td style={{color:s.otH>0?'var(--rd)':'inherit',fontWeight:s.otH>0?700:400}}>
+                      {s.otH>0?s.otH.toFixed(1)+'h ⚠️':'—'}
+                    </td>
+                    <td>{yen(s.basePay)}</td>
+                    <td style={{color:'var(--rd)'}}>{s.otPay>0?yen(s.otPay):'—'}</td>
+                    <td style={{color:'var(--pu)'}}>{s.nightPay>0?yen(s.nightPay):'—'}</td>
+                    <td style={{fontWeight:700}}>{yen(s.totalPay)}</td>
+                    <td><span className={`badge ${s.warn?'b-rd':'b-gn'}`}>{s.warn?'⚠️ 要確認':'✅ 正常'}</span></td>
+                  </tr>
+                ))}
+                <tr style={{background:'#FFF8F0',fontWeight:700}}>
+                  <td colSpan={5} style={{textAlign:'right'}}>人件費合計</td>
+                  <td colSpan={4}>{yen(staffStats.reduce((s,r)=>s+r.totalPay,0))}</td>
+                  <td></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <div style={{marginTop:14,padding:'12px 14px',background:'#FFF8F0',borderRadius:8,fontSize:12.5,color:'#666'}}>
+            ⚖️ 労基法チェックポイント：1日8時間超（時間外割増25%）｜週40時間超（時間外割増25%）｜22時〜5時（深夜割増25%）｜月45時間超（36協定上限）
+          </div>
+        </div>
+      )}
+      {activeTab==='stafflist'&&(
+        <div>
+          <div className="action-bar">
+            <span style={{fontWeight:600}}>スタッフ {staff.length}名</span>
+            <button className="btn btn-primary" onClick={()=>{setSform(STEMPTY);setEditStaff(null);setStaffModal(true);}}>＋ スタッフを追加</button>
+          </div>
+          <div className="card">
+            <div className="table-wrap">
+              <table>
+                <thead><tr><th>名前</th><th>役職</th><th>雇用形態</th><th>保有資格</th><th>給与</th><th>入社日</th><th>操作</th></tr></thead>
+                <tbody>
+                  {staff.map(s=>(
+                    <tr key={s.id}>
+                      <td><div style={{fontWeight:700}}>{s.name}</div><div style={{fontSize:11,color:'#888'}}>{s.kana}</div></td>
+                      <td><span className="tag">{s.role}</span></td>
+                      <td><span className="badge b-bl">{s.employment}</span></td>
+                      <td style={{fontSize:12}}>{(s.qualifications||[]).join('・')}</td>
+                      <td style={{fontSize:12.5}}>{s.employment==='常勤'?yen(s.monthlySalary)+'/月':yen(s.hourlyWage)+'/時'}</td>
+                      <td style={{fontSize:12}}>{s.joinDate}</td>
+                      <td><div style={{display:'flex',gap:5}}>
+                        <button className="btn btn-outline btn-xs" onClick={()=>{setSform({...s,qualifications:s.qualifications||[]});setEditStaff(s.id);setStaffModal(true);}}>編集</button>
+                        <button className="btn btn-ghost btn-xs" style={{color:'var(--rd)'}} onClick={()=>delStaff(s.id)}>削除</button>
+                      </div></td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      )}
+      {modal&&(
+        <Modal title={edit?'シフトを編集':'シフトを追加'} onClose={()=>setModal(false)}>
+          <div className="fr2">
+            <div className="fg"><label>スタッフ *</label><select className="fc" value={form.staffId} onChange={e=>setF('staffId',e.target.value)}><option value="">選択</option>{staff.map(s=><option key={s.id} value={s.id}>{s.name}</option>)}</select></div>
+            <div className="fg"><label>日付 *</label><input type="date" className="fc" value={form.date} onChange={e=>setF('date',e.target.value)}/></div>
+          </div>
+          <div className="fr3">
+            <div className="fg"><label>開始時刻</label><input type="time" className="fc" value={form.startTime} onChange={e=>setF('startTime',e.target.value)}/></div>
+            <div className="fg"><label>終了時刻</label><input type="time" className="fc" value={form.endTime} onChange={e=>setF('endTime',e.target.value)}/></div>
+            <div className="fg"><label>休憩（分）</label><input type="number" className="fc" value={form.breakMin} onChange={e=>setF('breakMin',parseInt(e.target.value)||0)}/></div>
+          </div>
+          {form.startTime&&form.endTime&&<div className="notice n-info" style={{fontSize:12}}>実働時間：{calcHours(form.startTime,form.endTime,form.breakMin).toFixed(1)}時間{calcHours(form.startTime,form.endTime,form.breakMin)>8&&' ⚠️ 8時間超・時間外割増が発生します'}</div>}
+          <div className="fg"><label>備考</label><input className="fc" value={form.notes} onChange={e=>setF('notes',e.target.value)}/></div>
+          <div className="modal-ftr"><button className="btn btn-ghost" onClick={()=>setModal(false)}>キャンセル</button><button className="btn btn-primary" onClick={saveShift}>💾 保存する</button></div>
+        </Modal>
+      )}
+      {staffModal&&(
+        <Modal title={editStaff?'スタッフを編集':'スタッフを追加'} onClose={()=>setStaffModal(false)} wide>
+          <div className="fr2">
+            <div className="fg"><label>氏名 *</label><input className="fc" value={sform.name} onChange={e=>setSF('name',e.target.value)}/></div>
+            <div className="fg"><label>ふりがな</label><input className="fc" value={sform.kana} onChange={e=>setSF('kana',e.target.value)}/></div>
+          </div>
+          <div className="fr3">
+            <div className="fg"><label>役職</label><select className="fc" value={sform.role} onChange={e=>setSF('role',e.target.value)}>{['管理者','サービス提供責任者','ヘルパー（常勤）','ヘルパー（非常勤）','ヘルパー（登録）'].map(r=><option key={r}>{r}</option>)}</select></div>
+            <div className="fg"><label>雇用形態</label><select className="fc" value={sform.employment} onChange={e=>setSF('employment',e.target.value)}>{['常勤','非常勤','登録'].map(e=><option key={e}>{e}</option>)}</select></div>
+            <div className="fg"><label>週所定労働時間</label><input type="number" className="fc" value={sform.weeklyHours} onChange={e=>setSF('weeklyHours',parseInt(e.target.value)||0)}/></div>
+          </div>
+          <div className="fr2">
+            {sform.employment==='常勤'?<div className="fg"><label>月給（円）</label><input type="number" className="fc" value={sform.monthlySalary} onChange={e=>setSF('monthlySalary',parseInt(e.target.value)||0)}/></div>:<div className="fg"><label>時給（円）</label><input type="number" className="fc" value={sform.hourlyWage} onChange={e=>setSF('hourlyWage',parseInt(e.target.value)||0)}/></div>}
+            <div className="fg"><label>入社日</label><input type="date" className="fc" value={sform.joinDate} onChange={e=>setSF('joinDate',e.target.value)}/></div>
+          </div>
+          <div className="fg"><label>保有資格（複数選択可）</label>
+            <div style={{display:'flex',flexWrap:'wrap',gap:8,marginTop:6}}>
+              {QUALIFS.map(q=>(
+                <label key={q} style={{display:'flex',alignItems:'center',gap:5,cursor:'pointer',fontSize:12.5}}>
+                  <input type="checkbox" checked={(sform.qualifications||[]).includes(q)} onChange={e=>{const cur=sform.qualifications||[];setSF('qualifications',e.target.checked?[...cur,q]:cur.filter(x=>x!==q));}}/>
+                  {q}
+                </label>
+              ))}
+            </div>
+          </div>
+          <div className="modal-ftr"><button className="btn btn-ghost" onClick={()=>setStaffModal(false)}>キャンセル</button><button className="btn btn-primary" onClick={saveStaff}>💾 保存する</button></div>
+        </Modal>
+      )}
+    </div>
+  );
+}
+
+// ===== 加算管理 =====
+function KasanManager({kasan,setKasan,staff,residents}){
+  const [localK,setLocalK]=useState(kasan);
+  const setK=(key,val)=>setLocalK(k=>({...k,[key]:{...k[key],...val}}));
+  const save=()=>{setKasan(localK);ss('kasanSettings',localK);alert('加算設定を保存しました');};
+  const fuwStaff=staff.filter(s=>(s.qualifications||[]).includes('介護福祉士'));
+  const sacho=staff.filter(s=>s.role==='サービス提供責任者'&&s.employment==='常勤');
+  const kaigoPct=staff.length>0?Math.round(fuwStaff.length/staff.length*100):0;
+  const kkRes=calcKasan(residents,localK);
+  const totalBase=kkRes.reduce((s,r)=>s+Math.floor(r.baseU*UNIT_PRICE),0);
+  const totalKasan=kkRes.reduce((s,r)=>s+Math.floor((r.totalU-r.baseU)*UNIT_PRICE),0);
+  const totalAmt=kkRes.reduce((s,r)=>s+r.totalAmt,0);
+  const reqCheck={
+    sacho:sacho.length>0,
+    kaigo50:kaigoPct>=50,
+    kaigo70:kaigoPct>=70,
+  };
+  return(
+    <div>
+      <div className="page-header">
+        <h2>⚡ 加算管理</h2>
+        <p>事業所の加算取得状況を設定・管理し、請求額を自動計算します（令和6年度改定対応）</p>
+      </div>
+      {!reqCheck.sacho&&(
+        <div className="alert-banner al-danger" style={{marginBottom:14}}>
+          ⚠️ サービス提供責任者（常勤）が登録されていません。特定事業所加算の要件を確認してください。
+        </div>
+      )}
+      <div style={{display:'grid',gridTemplateColumns:'1fr 1fr 1fr',gap:12,marginBottom:18}}>
+        <div className="stat-card"><div className="stat-label">基本報酬（概算）</div><div className="stat-value" style={{fontSize:18}}>{yen(totalBase)}</div><div className="stat-sub">加算なしの場合</div></div>
+        <div className="stat-card" style={{borderColor:'var(--pu)30'}}><div className="stat-label">加算額合計（概算）</div><div className="stat-value" style={{fontSize:18,color:'var(--pu)'}}>{yen(totalKasan)}</div><div className="stat-sub">全加算合計</div></div>
+        <div className="stat-card" style={{borderColor:'var(--or)'}}><div className="stat-label">加算込み報酬（概算）</div><div className="stat-value" style={{fontSize:18}}>{yen(totalAmt)}</div><div className="stat-sub">月間総請求額</div></div>
+      </div>
+      <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:16,marginBottom:18}}>
+        <div className="card">
+          <div className="section-title">🏢 事業所要件チェック</div>
+          {[
+            {label:'サ責常勤専従配置',ok:reqCheck.sacho,detail:sacho.length>0?sacho.map(s=>s.name).join('、'):'未登録'},
+            {label:'介護福祉士50%以上',ok:reqCheck.kaigo50,detail:`現在 ${kaigoPct}%（${fuwStaff.length}/${staff.length}名）`},
+            {label:'介護福祉士70%以上',ok:reqCheck.kaigo70,detail:`現在 ${kaigoPct}%（${fuwStaff.length}/${staff.length}名）`},
+          ].map((c,i)=>(
+            <div key={i} style={{display:'flex',alignItems:'center',gap:10,padding:'7px 0',borderBottom:'1px solid #f5f5f5'}}>
+              <span style={{fontSize:18}}>{c.ok?'✅':'❌'}</span>
+              <div><div style={{fontSize:12.5,fontWeight:600}}>{c.label}</div><div style={{fontSize:11,color:'#888'}}>{c.detail}</div></div>
+            </div>
+          ))}
+        </div>
+        <div className="card">
+          <div className="section-title">💡 月間加算内訳（概算）</div>
+          {kkRes.filter(r=>Object.values(r.breakdown||{}).reduce((s,v)=>s+v,0)>0).map(r=>(
+            <div key={r.id} style={{marginBottom:8}}>
+              <div style={{fontSize:12.5,fontWeight:600,marginBottom:3}}>{r.name}</div>
+              {Object.entries(r.breakdown||{}).map(([k,v])=>(
+                <div key={k} style={{display:'flex',justifyContent:'space-between',fontSize:11.5,padding:'2px 8px',color:'#555'}}>
+                  <span>{k==='tokutei'?'特定事業所加算':k==='taisei'?'体制強化加算':k==='shokai'?'初回加算':k==='shogu'?'処遇改善加算':k}（{v}単位）</span>
+                  <span style={{fontWeight:600,color:'var(--pu)'}}>{yen(Math.floor(v*UNIT_PRICE))}</span>
+                </div>
+              ))}
+            </div>
+          ))}
+          {kkRes.every(r=>Object.values(r.breakdown||{}).reduce((s,v)=>s+v,0)===0)&&<p style={{fontSize:12.5,color:'#aaa'}}>加算が有効になっていません</p>}
+        </div>
+      </div>
+      <div className="card">
+        <div className="section-title">⚙️ 加算設定（適用するものをONにしてください）</div>
+        {/* 特定事業所加算 */}
+        <div className={`kasan-card ${localK.tokuteiJigyosho.enabled?'kasan-on':'kasan-off'}`}>
+          <div style={{display:'flex',justifyContent:'space-between',alignItems:'flex-start'}}>
+            <div>
+              <div style={{fontWeight:700,fontSize:13.5,marginBottom:4}}>🏢 特定事業所加算（居宅介護のみ）</div>
+              <div style={{fontSize:12,color:'#666',marginBottom:6}}>利用者へ提供するサービスの質・体制に応じて最大+20%</div>
+              {localK.tokuteiJigyosho.enabled&&(
+                <select className="fc" style={{width:280,fontSize:12}} value={localK.tokuteiJigyosho.level} onChange={e=>setK('tokuteiJigyosho',{level:e.target.value})}>
+                  {KASAN_DEF.tokuteiJigyosho.options.map(o=><option key={o.level} value={o.level}>{o.label}</option>)}
+                </select>
+              )}
+            </div>
+            <div className={`toggle ${localK.tokuteiJigyosho.enabled?'ton':''}`} onClick={()=>setK('tokuteiJigyosho',{enabled:!localK.tokuteiJigyosho.enabled})}/>
+          </div>
+          {localK.tokuteiJigyosho.enabled&&(
+            <div style={{marginTop:8,fontSize:11.5,color:'#777'}}>
+              主な算定要件：{(KASAN_DEF.tokuteiJigyosho.options.find(o=>o.level===localK.tokuteiJigyosho.level)||{}).req?.join('・')}
+            </div>
+          )}
+        </div>
+        {/* サービス提供体制強化加算 */}
+        <div className={`kasan-card ${localK.taisei.enabled?'kasan-on':'kasan-off'}`}>
+          <div style={{display:'flex',justifyContent:'space-between',alignItems:'flex-start'}}>
+            <div>
+              <div style={{fontWeight:700,fontSize:13.5,marginBottom:4}}>💪 サービス提供体制強化加算（居宅介護・重度訪問）</div>
+              <div style={{fontSize:12,color:'#666',marginBottom:6}}>有資格者の配置割合に応じて1回あたり+2〜+6単位</div>
+              {localK.taisei.enabled&&(
+                <select className="fc" style={{width:280,fontSize:12}} value={localK.taisei.level} onChange={e=>setK('taisei',{level:e.target.value})}>
+                  {KASAN_DEF.taisei.options.map(o=><option key={o.level} value={o.level}>{o.label}</option>)}
+                </select>
+              )}
+            </div>
+            <div className={`toggle ${localK.taisei.enabled?'ton':''}`} onClick={()=>setK('taisei',{enabled:!localK.taisei.enabled})}/>
+          </div>
+          {localK.taisei.enabled&&<div style={{marginTop:8,fontSize:11.5,color:'#777'}}>現在の介護福祉士配置：{kaigoPct}% ／ 加算Ⅰには70%以上が必要</div>}
+        </div>
+        {/* 初回加算 */}
+        <div className={`kasan-card ${localK.shokai.enabled?'kasan-on':'kasan-off'}`}>
+          <div style={{display:'flex',justifyContent:'space-between',alignItems:'center'}}>
+            <div>
+              <div style={{fontWeight:700,fontSize:13.5}}>🆕 初回加算（居宅介護のみ）</div>
+              <div style={{fontSize:12,color:'#666'}}>新規利用者の最初の月に200単位を加算（自動で新規フラグの利用者に適用）</div>
+              <div style={{fontSize:11.5,color:'var(--bl)',marginTop:4}}>新規フラグ利用者：{residents.filter(r=>r.isNew&&r.serviceType==='居宅介護').map(r=>r.name).join('、')||'なし'}</div>
+            </div>
+            <div className={`toggle ${localK.shokai.enabled?'ton':''}`} onClick={()=>setK('shokai',{enabled:!localK.shokai.enabled})}/>
+          </div>
+        </div>
+        {/* 福祉・介護職員等処遇改善加算（令和6年度改定で一本化） */}
+        <div className={`kasan-card ${localK.shogu.enabled?'kasan-on':'kasan-off'}`}>
+          <div style={{display:'flex',justifyContent:'space-between',alignItems:'flex-start'}}>
+            <div style={{flex:1}}>
+              <div style={{fontWeight:700,fontSize:13.5,marginBottom:4}}>💴 福祉・介護職員等処遇改善加算（一本化）</div>
+              <div style={{fontSize:12,color:'#666',marginBottom:6}}>旧3加算を統合し総単位数に加算率を乗じる。<strong>令和8年6月提供分から改定</strong>：居宅Ⅲ37.6%／重訪Ⅲ30.2%（るみなすは加算Ⅲ）。R8年5月提供分までは旧率（34.7%／27.3%）。</div>
+              {localK.shogu.enabled&&(
+                <select className="fc" style={{width:340,fontSize:12}} value={localK.shogu.level} onChange={e=>setK('shogu',{level:e.target.value})}>
+                  {KASAN_DEF.shogu.serviceRates['居宅介護'].map(o=><option key={o.level} value={o.level}>{o.label}{o.level!=='なし'?'｜重訪 '+(KASAN_DEF.shogu.serviceRates['重度訪問介護'].find(x=>x.level===o.level)||{}).label:''}</option>)}
+                </select>
+              )}
+            </div>
+            <div className={`toggle ${localK.shogu.enabled?'ton':''}`} onClick={()=>setK('shogu',{enabled:!localK.shogu.enabled})}/>
+          </div>
+          {localK.shogu.enabled&&<div style={{marginTop:8,fontSize:11.5,color:'#777'}}>算定要件：{KASAN_DEF.shogu.req.join('・')}</div>}
+        </div>
+        <div style={{display:'flex',justifyContent:'flex-end',marginTop:16,gap:10}}>
+          <button className="btn btn-ghost" onClick={()=>setLocalK(kasan)}>リセット</button>
+          <button className="btn btn-primary" onClick={save}>💾 加算設定を保存する</button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ===== 月次請求管理 =====
+function MonthlyBilling({residents,careRecords,kasan}){
+  const [month,setMonth]=useState(curM());
+  const [kkTab,setKkTab]=useState(1);
+  const [checklist,setChecklist]=useState(()=>ls('billing_check',{}));
+  const [step,setStep]=useState(1);
+  const kkMonthData=KK_BILLING.months[kkTab]||KK_BILLING.months[0];
+  const kkRes=calcKasan(residents,kasan);
+  const totalBenefit=kkRes.reduce((s,r)=>s+r.benefit,0);
+  const totalCopay=kkRes.reduce((s,r)=>s+r.copay,0);
+  const totalAmt=kkRes.reduce((s,r)=>s+r.totalAmt,0);
+  const toggleCheck=(id)=>{const u={...checklist,[`${month}_${id}`]:!checklist[`${month}_${id}`]};setChecklist(u);ss('billing_check',u);};
+  const isChecked=(id)=>!!checklist[`${month}_${id}`];
+  const STEPS=[
+    {n:1,label:'① 事前確認',color:'var(--bl)',items:[
+      {id:'c1',label:'ケア記録の入力漏れがないか確認した'},
+      {id:'c2',label:'受給者証の有効期限と支給量を確認した'},
+      {id:'c3',label:'加算の算定要件を確認した'},
+      {id:'c13',label:'同一日の重複請求がないか確認した（他事業所とのサービス併用を実績記録表で共有）'},
+    ]},
+    {n:2,label:'② 請求データ作成',color:'var(--or)',items:[
+      {id:'c4',label:'かんたん介護ソフトにログインした'},
+      {id:'c5',label:'「請求」→「基本」タブで集計を実行した'},
+      {id:'c6',label:'「請求情報」タブで書類を確認した'},
+      {id:'c7',label:'請求内容（金額・利用者）に誤りがないか確認した'},
+    ]},
+    {n:3,label:'③ 国保連へ伝送',color:'var(--pu)',items:[
+      {id:'c8',label:'電子証明書の有効期限を確認した'},
+      {id:'c9',label:'かんたん介護の「電子請求」タブから伝送した'},
+      {id:'c10',label:'伝送完了・エラーなしを確認した'},
+    ]},
+    {n:4,label:'④ 審査結果確認',color:'var(--gn)',items:[
+      {id:'c14',label:'市町村二次審査（毎月22〜24日・土日除く）中の連絡に対応できた ※重複請求は24日10時までに調整不可だと両方返戻'},
+      {id:'c11',label:'審査結果通知書を確認した（翌月中旬以降）'},
+      {id:'c12',label:'支払通知書の金額を確認し経理に反映した'},
+    ]},
+  ];
+  const STEP_COLORS=['','var(--bl)','var(--or)','var(--pu)','var(--gn)'];
+  const stepDone=(n)=>STEPS[n-1].items.every(i=>isChecked(i.id));
+  const exportCSV=()=>{
+    const h='利用者名,サービス種別,障害支援区分,月間支給量,基本報酬,加算額,合計請求額,給付費（市負担分）,利用者負担\n';
+    const rows=kkRes.map(r=>`"${r.name}","${r.serviceType}","${r.supportLevel||''}",${r.serviceHours},${yen(Math.floor(r.baseU*UNIT_PRICE))},${yen(Math.floor((r.totalU-r.baseU)*UNIT_PRICE))},${yen(r.totalAmt)},${yen(r.benefit)},${yen(r.copay)}`).join('\n');
+    const blob=new Blob(['\uFEFF'+h+rows],{type:'text/csv;charset=utf-8;'});
+    const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download=`るみなす_請求_${month}.csv`;a.click();URL.revokeObjectURL(url);
+  };
+  return(
+    <div>
+      <div className="page-header">
+        <h2>🏛️ 月次請求管理（国保連連携）</h2>
+        <p>加算込み請求額を自動計算し、かんたん介護→国保連の伝送フローをサポートします</p>
+      </div>
+      {/* 行政連絡に基づく重要期限（出典：札幌市障がい福祉課メール 2026-06-30/07-01） */}
+      <div className="notice n-warn" style={{marginBottom:12}}>
+        📌 <strong>年次期限</strong>：処遇改善加算の<strong>実績報告</strong>は毎年7月末（令和7年度分：<strong>令和8年7月31日(金) 23:59</strong>・
+        <a href="https://ttzk.graffer.jp/city-sapporo/smart-apply/apply-procedure-alias/situmonhyo/door" target="_blank" rel="noreferrer" style={{color:'#7D6608',fontWeight:700}}>スマート申請のみ</a>）。
+        未提出は<strong>加算返還</strong>の対象。／ 請求・加算の問い合わせも電話不可・スマート申請へ。
+        処遇改善加算は<strong>令和8年6月提供分から改定</strong>あり（7月請求時に明細書で反映を確認）。
+      </div>
+      <div style={{display:'grid',gridTemplateColumns:'repeat(4,1fr)',gap:10,marginBottom:16}}>
+        {[
+          {icon:'📡',label:'伝送状況',val:KK_BILLING.transmitStatus,c:'var(--gn)'},
+          {icon:'🔍',label:'審査状況',val:KK_BILLING.reviewStatus,c:'var(--yw)'},
+          {icon:'🏢',label:'事業所番号',val:KK_BILLING.officeCode,c:'var(--pu)'},
+          {icon:'🕐',label:'最終同期',val:'R8/3/4 16:13',c:'var(--bl)'},
+        ].map((s,i)=>(
+          <div key={i} className="card" style={{padding:'11px 13px'}}>
+            <div style={{fontSize:11,color:'#888',marginBottom:3}}>{s.icon} {s.label}</div>
+            <div style={{fontWeight:700,fontSize:13,color:s.c}}>{s.val}</div>
+          </div>
+        ))}
+      </div>
+      {/* かんたん介護 実際の請求データ */}
+      <div className="card" style={{marginBottom:16,borderLeft:'4px solid var(--or)'}}>
+        <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:12}}>
+          <div><div className="section-title" style={{margin:0}}>📋 かんたん介護 請求集計票（同期済み）</div>
+            <div style={{fontSize:11.5,color:'#888',marginTop:2}}>事業所：{KK_BILLING.officeName} ／ 取得：{KK_BILLING.syncedAtLabel}</div>
+          </div>
+          <div style={{display:'flex',gap:8}}>
+            <a href="https://www.kantankaigo.jp/home/seikyuus" target="_blank" rel="noreferrer"><button className="btn btn-outline btn-sm">📋 請求ページ</button></a>
+            <a href="https://www.kantankaigo.jp/home/syuukeis/shougaiCsv" target="_blank" rel="noreferrer"><button className="btn btn-outline btn-sm">📄 集計票</button></a>
+          </div>
+        </div>
+        <div style={{display:'flex',gap:6,marginBottom:12}}>
+          {KK_BILLING.months.map((m,i)=>(
+            <button key={i} onClick={()=>setKkTab(i)} style={{padding:'5px 12px',borderRadius:7,border:'none',cursor:'pointer',fontSize:12.5,fontWeight:600,background:kkTab===i?'var(--or)':'#f5f5f5',color:kkTab===i?'white':'#555'}}>{m.label}</button>
+          ))}
+        </div>
+        <div className="table-wrap">
+          <table>
+            <thead><tr><th>#</th><th>利用者名</th><th>単位数</th><th>サービス費</th><th>給付費分</th><th>利用者負担</th><th>ステータス</th></tr></thead>
+            <tbody>
+              {kkMonthData.residents.map((r,i)=>(
+                <tr key={i}>
+                  <td style={{color:'#888'}}>{i+1}</td>
+                  <td style={{fontWeight:700}}>{r.name}</td>
+                  <td>{r.units.toLocaleString()}</td>
+                  <td>{yen(r.service)}</td>
+                  <td style={{color:'var(--gn)',fontWeight:600}}>{yen(r.paid)}</td>
+                  <td style={{color:r.copay>0?'var(--or)':'#888'}}>{r.copay>0?yen(r.copay):'—'}</td>
+                  <td><span className="badge b-gn">✓ 集計済</span></td>
+                </tr>
+              ))}
+              <tr style={{background:'#FFF8F0',fontWeight:700}}>
+                <td colSpan={2} style={{textAlign:'right',color:'#888'}}>合計</td>
+                <td>{kkMonthData.totalUnits.toLocaleString()}</td>
+                <td>{yen(kkMonthData.totalService)}</td>
+                <td style={{color:'var(--gn)'}}>{yen(kkMonthData.totalPaid)}</td>
+                <td style={{color:'var(--or)'}}>{yen(kkMonthData.totalCopay)}</td>
+                <td></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div style={{marginTop:12,padding:'10px 13px',background:'#FFF3E0',borderRadius:8,display:'flex',alignItems:'center',justifyContent:'space-between'}}>
+          <div>
+            <div style={{fontSize:11.5,color:'#888',marginBottom:3}}>審査状況（{KK_BILLING.reviewMonth}）</div>
+            <div style={{display:'flex',gap:10,alignItems:'center'}}>
+              {['伝送完了','審査中','支払決定'].map((s,i)=>(
+                <React.Fragment key={i}>
+                  <div style={{display:'flex',alignItems:'center',gap:5}}>
+                    <div style={{width:9,height:9,borderRadius:'50%',background:i===0?'var(--gn)':i===1?'var(--or)':'#ccc'}}/>
+                    <span style={{fontSize:12.5,fontWeight:600,color:i===0?'var(--gn)':i===1?'var(--or)':'#ccc'}}>{s}</span>
+                  </div>
+                  {i<2&&<span style={{color:'#ccc',fontSize:16}}>→</span>}
+                </React.Fragment>
+              ))}
+            </div>
+          </div>
+          <a href="https://www.kantankaigo.jp/home/seikyuus" target="_blank" rel="noreferrer"><button className="btn btn-outline btn-sm">審査結果タブを確認 →</button></a>
+        </div>
+      </div>
+      {/* 加算込み概算請求 */}
+      <div className="card" style={{marginBottom:16}}>
+        <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:12}}>
+          <div>
+            <div className="section-title" style={{margin:0}}>⚡ 加算込み概算請求額（るみなす試算）</div>
+            <div style={{fontSize:11.5,color:'#888',marginTop:2}}>
+              <input type="month" value={month} onChange={e=>setMonth(e.target.value)} style={{fontSize:12,border:'1px solid #ddd',borderRadius:5,padding:'2px 6px',marginRight:8}}/>
+              加算設定に基づく概算値。実際の請求額はかんたん介護で確認してください。<br/>
+              ※ 移動支援は地域生活支援事業（<strong>市町村請求</strong>）で国保連・処遇改善加算の対象外。単価は自治体ごとに異なるため下表は参考概算です。
+            </div>
+          </div>
+          <button className="btn btn-outline btn-sm" onClick={exportCSV}>📥 CSVで書き出し</button>
+        </div>
+        <div className="table-wrap">
+          <table>
+            <thead><tr><th>利用者名</th><th>サービス種別</th><th>支援区分</th><th>基本報酬</th><th>加算合計</th><th>総請求額</th><th>給付費（9割）</th><th>利用者負担</th></tr></thead>
+            <tbody>
+              {kkRes.map(r=>(
+                <tr key={r.id}>
+                  <td style={{fontWeight:700}}>{r.name}</td>
+                  <td><SvcBadge type={r.serviceType}/></td>
+                  <td><SupportBadge level={r.supportLevel||'非該当'}/></td>
+                  <td>{yen(Math.floor(r.baseU*UNIT_PRICE))}</td>
+                  <td style={{color:'var(--pu)',fontWeight:600}}>{yen(Math.floor((r.totalU-r.baseU)*UNIT_PRICE))}</td>
+                  <td style={{fontWeight:700}}>{yen(r.totalAmt)}</td>
+                  <td style={{color:'var(--gn)',fontWeight:600}}>{yen(r.benefit)}{!r.isKokuho&&<span className="badge b-gy" style={{fontSize:9,marginLeft:4}}>市町村</span>}</td>
+                  <td style={{color:r.copay>0?'var(--or)':'#888'}}>{r.copay>0?yen(r.copay):'—'}</td>
+                </tr>
+              ))}
+              {(()=>{const ko=kkRes.filter(r=>r.isKokuho);const si=kkRes.filter(r=>!r.isKokuho);
+                const row=(label,arr,c)=>(
+                  <tr style={{background:'#FFF8F0',fontWeight:700}}>
+                    <td colSpan={3} style={{textAlign:'right',color:c}}>{label}</td>
+                    <td>{yen(arr.reduce((s,r)=>s+Math.floor(r.baseU*UNIT_PRICE),0))}</td>
+                    <td style={{color:'var(--pu)'}}>{yen(arr.reduce((s,r)=>s+Math.floor((r.totalU-r.baseU)*UNIT_PRICE),0))}</td>
+                    <td>{yen(arr.reduce((s,r)=>s+r.totalAmt,0))}</td>
+                    <td style={{color:'var(--gn)'}}>{yen(arr.reduce((s,r)=>s+r.benefit,0))}</td>
+                    <td style={{color:'var(--or)'}}>{yen(arr.reduce((s,r)=>s+r.copay,0))}</td>
+                  </tr>);
+                return(<React.Fragment>
+                  {row('国保連請求分 合計（居宅・重訪）',ko,'#888')}
+                  {si.length>0&&row('市町村請求分 合計（移動支援・概算）',si,'var(--bl)')}
+                </React.Fragment>);
+              })()}
+            </tbody>
+          </table>
+        </div>
+      </div>
+      {/* 業務チェックリスト */}
+      <div className="card">
+        <div className="section-title">✅ 請求業務チェックリスト</div>
+        <div style={{display:'flex',gap:6,marginBottom:16,flexWrap:'wrap'}}>
+          {STEPS.map(s=>(
+            <button key={s.n} onClick={()=>setStep(s.n)} style={{padding:'6px 12px',borderRadius:7,border:'none',cursor:'pointer',fontSize:12.5,fontWeight:600,background:step===s.n?s.color:stepDone(s.n)?'#E9F7EF':'#f5f5f5',color:step===s.n?'white':stepDone(s.n)?'var(--gn)':'#555'}}>
+              {stepDone(s.n)?'✅ ':''}{s.label}
+            </button>
+          ))}
+        </div>
+        <div style={{borderLeft:`4px solid ${STEP_COLORS[step]}`,paddingLeft:14}}>
+          <div style={{color:STEP_COLORS[step],fontWeight:700,marginBottom:10,fontSize:13}}>{STEPS[step-1].label}</div>
+          {STEPS[step-1].items.map(item=>(
+            <div key={item.id} onClick={()=>toggleCheck(item.id)}
+              style={{display:'flex',alignItems:'center',gap:9,marginBottom:8,padding:'9px 12px',background:isChecked(item.id)?'#E9F7EF':'#FAFAFA',borderRadius:8,cursor:'pointer'}}>
+              <span style={{fontSize:17}}>{isChecked(item.id)?'✅':'⬜'}</span>
+              <span style={{fontSize:13,color:isChecked(item.id)?'var(--gn)':'#333',textDecoration:isChecked(item.id)?'line-through':'none'}}>{item.label}</span>
+            </div>
+          ))}
+          {step===2&&<div style={{marginTop:12,padding:'11px 13px',background:'#EBF5FB',borderRadius:8}}>
+            <div style={{fontWeight:700,marginBottom:8,fontSize:13,color:'#1A5276'}}>📋 かんたん介護 請求手順</div>
+            <div style={{fontSize:12.5,lineHeight:1.9,color:'#1A5276'}}>
+              1. <a href="https://www.kantankaigo.jp/home/seikyuus" target="_blank" style={{color:'#2980B9'}}>かんたん介護「請求」ページを開く</a><br/>
+              2. 「基本」タブ → 請求日を設定して「集計」ボタンをクリック<br/>
+              3. 「請求情報」タブで介護給付費等請求書・明細書を確認<br/>
+              4. 「電子請求」タブで伝送データを確認・実行
+            </div>
+            <div style={{display:'flex',gap:8,marginTop:10}}>
+              <a href="https://www.kantankaigo.jp/home/seikyuus" target="_blank" rel="noreferrer"><button className="btn btn-primary btn-sm">📋 請求ページへ →</button></a>
+              <a href="https://www.kantankaigo.jp/home/syuukeis/shougaiCsv" target="_blank" rel="noreferrer"><button className="btn btn-outline btn-sm">📄 集計票を開く</button></a>
+            </div>
+          </div>}
+          {step===3&&<div style={{marginTop:12,padding:'11px 13px',background:'#F5EEF8',borderRadius:8}}>
+            <div style={{fontWeight:700,marginBottom:8,fontSize:13,color:'#7D3C98'}}>🏛️ 国保連 電子請求受付システム</div>
+            <div style={{fontSize:12.5,lineHeight:1.9,color:'#7D3C98'}}>
+              1. <a href="https://www.e-seikyuu.jp/" target="_blank" style={{color:'#7D3C98'}}>e-seikyuu.jp</a> にアクセス ／ 電子証明書でログイン<br/>
+              2. かんたん介護から出力した請求データを伝送<br/>
+              3. 「送信状況照会」でエラーがないか確認
+            </div>
+            <a href="https://www.e-seikyuu.jp/" target="_blank" rel="noreferrer"><button className="btn btn-primary btn-sm" style={{marginTop:10}}>🏛️ e-seikyuu.jpを開く</button></a>
+          </div>}
+          <div style={{display:'flex',justifyContent:'space-between',marginTop:14}}>
+            {step>1&&<button className="btn btn-ghost btn-sm" onClick={()=>setStep(s=>s-1)}>◀ 前のステップ</button>}
+            {step<4&&<button className="btn btn-primary btn-sm" style={{marginLeft:'auto'}} onClick={()=>setStep(s=>s+1)}>次のステップ ▶</button>}
+            {step===4&&stepDone(4)&&<div style={{color:'var(--gn)',fontWeight:700,fontSize:13}}>🎉 {month}月の請求業務が完了しました！</div>}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ===== 経理管理 =====
+function AccountingManager({acct,setAcct}){
+  const [month,setMonth]=useState(curM());
+  const [activeTab,setActiveTab]=useState('overview');
+  const getM=()=>acct[month]||{income:{kokuhoren:0,city:0,copay:0,other:0},expense:{staff:0,transport:0,office:0,training:0,other:0},openBal:0};
+  const md=getM();
+  const totalInc=Object.values(md.income).reduce((s,v)=>s+v,0);
+  const totalExp=Object.values(md.expense).reduce((s,v)=>s+v,0);
+  const profit=totalInc-totalExp;
+  const closeBal=(md.openBal||0)+totalInc-totalExp;
+  const setField=(section,field,val)=>{
+    const updated={...acct,[month]:{...md,[section]:{...md[section],[field]:parseInt(val)||0}}};
+    setAcct(updated);ss('accounting',updated);
+  };
+  const months=Object.keys(acct).sort();
+  const INCOME_FIELDS=[
+    {key:'kokuhoren',label:'国保連 給付費収入',icon:'🏛️',color:'var(--gn)'},
+    {key:'city',label:'札幌市 移動支援補助金',icon:'🏙️',color:'var(--bl)'},
+    {key:'copay',label:'利用者負担収入',icon:'👤',color:'var(--or)'},
+    {key:'other',label:'その他収入',icon:'📦',color:'#888'},
+  ];
+  const EXP_FIELDS=[
+    {key:'staff',label:'人件費（給与・社会保険料）',icon:'👥',color:'var(--rd)'},
+    {key:'transport',label:'交通費・旅費',icon:'🚗',color:'var(--or)'},
+    {key:'office',label:'事務費（通信・消耗品・光熱費）',icon:'🏢',color:'var(--yw)'},
+    {key:'training',label:'研修費・資格取得費',icon:'📚',color:'var(--bl)'},
+    {key:'other',label:'その他経費',icon:'📋',color:'#888'},
+  ];
+  return(
+    <div>
+      <div className="page-header">
+        <h2>💰 経理管理</h2>
+        <p>月次の収入・支出を管理し、損益計算書を自動生成します</p>
+      </div>
+      <div style={{display:'flex',alignItems:'center',gap:12,marginBottom:16}}>
+        <input type="month" className="search-input" value={month} onChange={e=>setMonth(e.target.value)}/>
+        <span style={{fontSize:13,fontWeight:600}}>{month.replace('-','年')}月の経理データ</span>
+        <button className="btn btn-outline btn-sm" onClick={()=>{
+          if(!acct[month]){const upd={...acct,[month]:{income:{kokuhoren:0,city:0,copay:0,other:0},expense:{staff:0,transport:0,office:0,training:0,other:0},openBal:0}};setAcct(upd);ss('accounting',upd);}
+        }}>この月のデータを作成</button>
+      </div>
+      <div className="tabs">
+        {[['overview','📊 サマリー'],['income','💴 収入管理'],['expense','💸 支出管理'],['report','📄 月次決算書']].map(([id,label])=>(
+          <div key={id} className={`tab${activeTab===id?' active':''}`} onClick={()=>setActiveTab(id)}>{label}</div>
+        ))}
+      </div>
+      {activeTab==='overview'&&(
+        <div>
+          <div style={{display:'grid',gridTemplateColumns:'repeat(4,1fr)',gap:12,marginBottom:16}}>
+            <div className="stat-card"><div className="stat-label">💴 総収入</div><div className="stat-value" style={{fontSize:18,color:'var(--gn)'}}>{yen(totalInc)}</div></div>
+            <div className="stat-card"><div className="stat-label">💸 総支出</div><div className="stat-value" style={{fontSize:18,color:'var(--rd)'}}>{yen(totalExp)}</div></div>
+            <div className="stat-card"><div className="stat-label">📈 営業損益</div><div className="stat-value" style={{fontSize:18,color:profit>=0?'var(--gn)':'var(--rd)'}}>{yen(profit)}</div><div className="stat-sub">{profit>=0?'黒字':'赤字'} / 利益率 {totalInc>0?Math.round(profit/totalInc*100):0}%</div></div>
+            <div className="stat-card"><div className="stat-label">💼 期末残高（概算）</div><div className="stat-value" style={{fontSize:18,color:'var(--bl)'}}>{yen(closeBal)}</div></div>
+          </div>
+          <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:16,marginBottom:16}}>
+            <div className="card">
+              <div className="section-title">📥 収入内訳</div>
+              {INCOME_FIELDS.map(f=>(
+                <div key={f.key} style={{display:'flex',justifyContent:'space-between',alignItems:'center',padding:'6px 0',borderBottom:'1px solid #f5f5f5'}}>
+                  <span style={{fontSize:12.5}}>{f.icon} {f.label}</span>
+                  <span style={{fontWeight:700,color:f.color,fontSize:13}}>{yen(md.income[f.key]||0)}</span>
+                </div>
+              ))}
+              <div style={{display:'flex',justifyContent:'space-between',padding:'8px 0',fontWeight:700,fontSize:13,borderTop:'2px solid var(--gn)'}}>
+                <span>収入合計</span><span style={{color:'var(--gn)'}}>{yen(totalInc)}</span>
+              </div>
+            </div>
+            <div className="card">
+              <div className="section-title">📤 支出内訳</div>
+              {EXP_FIELDS.map(f=>(
+                <div key={f.key} style={{display:'flex',justifyContent:'space-between',alignItems:'center',padding:'6px 0',borderBottom:'1px solid #f5f5f5'}}>
+                  <span style={{fontSize:12.5}}>{f.icon} {f.label}</span>
+                  <span style={{fontWeight:700,color:f.color,fontSize:13}}>{yen(md.expense[f.key]||0)}</span>
+                </div>
+              ))}
+              <div style={{display:'flex',justifyContent:'space-between',padding:'8px 0',fontWeight:700,fontSize:13,borderTop:'2px solid var(--rd)'}}>
+                <span>支出合計</span><span style={{color:'var(--rd)'}}>{yen(totalExp)}</span>
+              </div>
+            </div>
+          </div>
+          <div className="card">
+            <div className="section-title">📊 月別収支推移</div>
+            <div style={{display:'flex',gap:10,overflowX:'auto',paddingBottom:8}}>
+              {months.map(m=>{
+                const md2=acct[m]||{income:{},expense:{}};
+                const inc=Object.values(md2.income||{}).reduce((s,v)=>s+v,0);
+                const exp=Object.values(md2.expense||{}).reduce((s,v)=>s+v,0);
+                const pft=inc-exp;
+                const maxV=Math.max(inc,exp,1);
+                return(
+                  <div key={m} style={{minWidth:90,textAlign:'center'}}>
+                    <div style={{display:'flex',flexDirection:'column',alignItems:'center',gap:2,marginBottom:6,height:80,justifyContent:'flex-end'}}>
+                      <div style={{width:16,background:'var(--gn)',height:Math.round(inc/maxV*70)+'px',borderRadius:3}}/>
+                      <div style={{width:16,background:'var(--rd)',height:Math.round(exp/maxV*70)+'px',borderRadius:3}}/>
+                    </div>
+                    <div style={{fontSize:10,color:'#888'}}>{m.replace('-','/')}</div>
+                    <div style={{fontSize:11,fontWeight:700,color:pft>=0?'var(--gn)':'var(--rd)'}}>{pft>=0?'+':''}{Math.round(pft/1000)}k</div>
+                  </div>
+                );
+              })}
+            </div>
+            <div style={{fontSize:11.5,color:'#888',marginTop:8}}>■ 緑：収入 ■ 赤：支出（単位：千円）</div>
+          </div>
+        </div>
+      )}
+      {activeTab==='income'&&(
+        <div className="card">
+          <div className="section-title">💴 {month.replace('-','年')}月 収入管理</div>
+          <div className="notice n-info">かんたん介護の請求確定後、国保連給付費収入を入力してください。審査確定は翌月中旬以降です。</div>
+          <div style={{display:'grid',gap:12}}>
+            {INCOME_FIELDS.map(f=>(
+              <div key={f.key} style={{display:'flex',alignItems:'center',gap:12,padding:'11px 13px',background:'#FAFAFA',borderRadius:9}}>
+                <div style={{fontSize:24}}>{f.icon}</div>
+                <div style={{flex:1}}>
+                  <div style={{fontWeight:600,fontSize:13}}>{f.label}</div>
+                  {f.key==='kokuhoren'&&<div style={{fontSize:11.5,color:'#888',marginTop:2}}>2月実績：{yen(KK_BILLING.months[1].totalPaid)}（参考値）</div>}
+                </div>
+                <div style={{display:'flex',alignItems:'center',gap:6}}>
+                  <span style={{fontSize:13,color:'#888'}}>¥</span>
+                  <input type="number" style={{width:150,padding:'6px 10px',border:'1.5px solid var(--orb)',borderRadius:7,fontSize:13,textAlign:'right',fontFamily:'inherit'}}
+                    value={md.income[f.key]||0} onChange={e=>setField('income',f.key,e.target.value)}/>
+                </div>
+              </div>
+            ))}
+          </div>
+          <div style={{marginTop:14,display:'flex',justifyContent:'space-between',padding:'10px 13px',background:'#E9F7EF',borderRadius:9}}>
+            <span style={{fontWeight:700,fontSize:13}}>収入合計</span>
+            <span style={{fontWeight:700,fontSize:15,color:'var(--gn)'}}>{yen(totalInc)}</span>
+          </div>
+        </div>
+      )}
+      {activeTab==='expense'&&(
+        <div className="card">
+          <div className="section-title">💸 {month.replace('-','年')}月 支出管理</div>
+          <div className="notice n-info">人件費はシフト・勤怠データを参考に入力してください。確定したら保存ボタンで反映されます。</div>
+          <div style={{display:'grid',gap:12}}>
+            {EXP_FIELDS.map(f=>(
+              <div key={f.key} style={{display:'flex',alignItems:'center',gap:12,padding:'11px 13px',background:'#FAFAFA',borderRadius:9}}>
+                <div style={{fontSize:24}}>{f.icon}</div>
+                <div style={{flex:1}}>
+                  <div style={{fontWeight:600,fontSize:13}}>{f.label}</div>
+                  {f.key==='staff'&&<div style={{fontSize:11.5,color:'#888',marginTop:2}}>※ シフト管理の勤怠データから人件費を確認・転記してください</div>}
+                </div>
+                <div style={{display:'flex',alignItems:'center',gap:6}}>
+                  <span style={{fontSize:13,color:'#888'}}>¥</span>
+                  <input type="number" style={{width:150,padding:'6px 10px',border:'1.5px solid var(--orb)',borderRadius:7,fontSize:13,textAlign:'right',fontFamily:'inherit'}}
+                    value={md.expense[f.key]||0} onChange={e=>setField('expense',f.key,e.target.value)}/>
+                </div>
+              </div>
+            ))}
+          </div>
+          <div style={{marginTop:14,display:'flex',justifyContent:'space-between',padding:'10px 13px',background:'#FDEDEC',borderRadius:9}}>
+            <span style={{fontWeight:700,fontSize:13}}>支出合計</span>
+            <span style={{fontWeight:700,fontSize:15,color:'var(--rd)'}}>{yen(totalExp)}</span>
+          </div>
+          <div style={{marginTop:10,display:'flex',justifyContent:'space-between',padding:'10px 13px',background:'#FFF8F0',borderRadius:9}}>
+            <div style={{fontSize:12,color:'#888'}}>期首残高</div>
+            <div style={{display:'flex',alignItems:'center',gap:6}}>
+              <span style={{fontSize:13,color:'#888'}}>¥</span>
+              <input type="number" style={{width:150,padding:'5px 8px',border:'1.5px solid var(--orb)',borderRadius:7,fontSize:13,textAlign:'right',fontFamily:'inherit'}}
+                value={md.openBal||0} onChange={e=>{const upd={...acct,[month]:{...md,openBal:parseInt(e.target.value)||0}};setAcct(upd);ss('accounting',upd);}}/>
+            </div>
+          </div>
+        </div>
+      )}
+      {activeTab==='report'&&(
+        <div className="card">
+          <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:16}}>
+            <div className="section-title" style={{margin:0}}>📄 {month.replace('-','年')}月 収支計算書（簡易）</div>
+            <button className="btn btn-outline btn-sm" onClick={()=>window.print()}>🖨️ 印刷</button>
+          </div>
+          <div style={{maxWidth:560,margin:'0 auto'}}>
+            <div style={{textAlign:'center',marginBottom:16}}>
+              <div style={{fontWeight:700,fontSize:16}}>るみなす　月次収支計算書</div>
+              <div style={{fontSize:13,color:'#888'}}>{month.replace('-','年')}月分</div>
+            </div>
+            <div style={{border:'2px solid var(--bd)',borderRadius:8,overflow:'hidden'}}>
+              <div style={{background:'#E9F7EF',padding:'8px 16px',fontWeight:700,fontSize:13}}>Ⅰ. 収入の部</div>
+              {INCOME_FIELDS.map(f=>(
+                <div key={f.key} style={{display:'flex',justifyContent:'space-between',padding:'7px 24px',borderBottom:'1px solid #f0f0f0'}}>
+                  <span style={{fontSize:13}}>{f.label}</span>
+                  <span style={{fontSize:13,fontWeight:600}}>{yen(md.income[f.key]||0)}</span>
+                </div>
+              ))}
+              <div style={{display:'flex',justifyContent:'space-between',padding:'9px 16px',background:'#E9F7EF',fontWeight:700}}>
+                <span>収入合計</span><span style={{color:'var(--gn)'}}>{yen(totalInc)}</span>
+              </div>
+              <div style={{background:'#FDEDEC',padding:'8px 16px',fontWeight:700,fontSize:13,marginTop:4}}>Ⅱ. 支出の部</div>
+              {EXP_FIELDS.map(f=>(
+                <div key={f.key} style={{display:'flex',justifyContent:'space-between',padding:'7px 24px',borderBottom:'1px solid #f0f0f0'}}>
+                  <span style={{fontSize:13}}>{f.label}</span>
+                  <span style={{fontSize:13,fontWeight:600}}>{yen(md.expense[f.key]||0)}</span>
+                </div>
+              ))}
+              <div style={{display:'flex',justifyContent:'space-between',padding:'9px 16px',background:'#FDEDEC',fontWeight:700}}>
+                <span>支出合計</span><span style={{color:'var(--rd)'}}>{yen(totalExp)}</span>
+              </div>
+              <div style={{background:profit>=0?'#E9F7EF':'#FDEDEC',padding:'12px 16px',borderTop:'2px solid',borderColor:profit>=0?'var(--gn)':'var(--rd)'}}>
+                <div style={{display:'flex',justifyContent:'space-between',fontWeight:700,fontSize:15}}>
+                  <span>Ⅲ. 当期営業損益</span><span style={{color:profit>=0?'var(--gn)':'var(--rd)'}}>{yen(profit)}</span>
+                </div>
+                <div style={{fontSize:12,color:'#888',marginTop:4}}>
+                  利益率：{totalInc>0?Math.round(profit/totalInc*100):0}%　／　期首残高：{yen(md.openBal||0)}　→　期末残高：{yen(closeBal)}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ===== 法令・制度更新 =====
+function LegalUpdates({legalUpdates,setLegalUpdates}){
+  const [modal,setModal]=useState(false);
+  const [edit,setEdit]=useState(null);
+  const EMPTY={id:'',title:'',type:'info',date:today(),source:'',content:''};
+  const [form,setForm]=useState(EMPTY);
+  const setF=(k,v)=>setForm(f=>({...f,[k]:v}));
+  const save=()=>{
+    if(!form.title.trim())return;
+    const rec={...form,id:edit||genId()};
+    const updated=edit?legalUpdates.map(u=>u.id===edit?rec:u):[...legalUpdates,rec];
+    setLegalUpdates(updated);ss('legalUpdates',updated);setModal(false);
+  };
+  const del=(id)=>{if(!window.confirm('削除しますか？'))return;const u=legalUpdates.filter(l=>l.id!==id);setLegalUpdates(u);ss('legalUpdates',u);};
+  const sorted=[...legalUpdates].sort((a,b)=>b.date.localeCompare(a.date));
+  const TYPE_LABELS={info:'ℹ️ 情報',warn:'⚠️ 注意',danger:'🚨 重要',success:'✅ 対応済'};
+  return(
+    <div>
+      <div className="page-header">
+        <h2>📢 法令・制度更新</h2>
+        <p>介護保険法・障害者総合支援法・労働基準法などの改正情報を管理します</p>
+      </div>
+      <div className="action-bar">
+        <span style={{fontSize:13,fontWeight:600}}>更新情報 {legalUpdates.length}件</span>
+        <button className="btn btn-primary" onClick={()=>{setForm(EMPTY);setEdit(null);setModal(true);}}>＋ 更新情報を追加</button>
+      </div>
+      <div className="card">
+        {sorted.length===0
+          ?<div className="empty-state"><div className="empty-icon">📢</div><p>更新情報はありません</p></div>
+          :sorted.map(u=>(
+            <div key={u.id} className={`notice n-${u.type}`} style={{marginBottom:10}}>
+              <div style={{display:'flex',justifyContent:'space-between',alignItems:'flex-start'}}>
+                <div style={{flex:1}}>
+                  <div style={{fontWeight:700,fontSize:13.5}}>{TYPE_LABELS[u.type]||''} {u.title}</div>
+                  <div style={{fontSize:11.5,marginTop:3,opacity:.8}}>{u.date}{u.source&&` ／ ${u.source}`}</div>
+                  {u.content&&<div style={{fontSize:12.5,marginTop:6,lineHeight:1.6}}>{u.content}</div>}
+                </div>
+                <div style={{display:'flex',gap:5,flexShrink:0,marginLeft:10}}>
+                  <button className="btn btn-ghost btn-xs" onClick={()=>{setForm({...u});setEdit(u.id);setModal(true);}}>編集</button>
+                  <button className="btn btn-ghost btn-xs" style={{color:'var(--rd)'}} onClick={()=>del(u.id)}>削除</button>
+                </div>
+              </div>
+            </div>
+          ))}
+      </div>
+      {modal&&(
+        <Modal title={edit?'更新情報を編集':'更新情報を追加'} onClose={()=>setModal(false)}>
+          <div className="fg"><label>タイトル *</label><input className="fc" value={form.title} onChange={e=>setF('title',e.target.value)} placeholder="例：令和7年度 障害福祉報酬改定"/></div>
+          <div className="fr3">
+            <div className="fg"><label>種別</label><select className="fc" value={form.type} onChange={e=>setF('type',e.target.value)}>
+              <option value="info">ℹ️ 情報</option><option value="warn">⚠️ 注意</option><option value="danger">🚨 重要</option><option value="success">✅ 対応済</option>
+            </select></div>
+            <div className="fg"><label>日付</label><input type="date" className="fc" value={form.date} onChange={e=>setF('date',e.target.value)}/></div>
+            <div className="fg"><label>出典</label><input className="fc" value={form.source} onChange={e=>setF('source',e.target.value)} placeholder="例：厚生労働省"/></div>
+          </div>
+          <div className="fg"><label>詳細内容</label><textarea className="fc" rows={4} value={form.content} onChange={e=>setF('content',e.target.value)}/></div>
+          <div className="modal-ftr"><button className="btn btn-ghost" onClick={()=>setModal(false)}>キャンセル</button><button className="btn btn-primary" onClick={save}>💾 保存する</button></div>
+        </Modal>
+      )}
+    </div>
+  );
+}
+
+// ===== 契約・研修管理 =====
+// データはlocalStorageの新キー ruminasu_contracts / ruminasu_training に保存（既存キーには触れない）
+const CONTRACT_CATS=['利用者契約','重要事項説明','職員雇用契約','規程同意','その他'];
+const CONTRACT_METHODS=['クラウドサイン','紙','その他'];
+const CONTRACT_STATUS=['準備中','送信済','締結済','更新要'];
+const TRAIN_FORMATS=['eラーニング','YouTube','外部研修','OJT','法定研修'];
+// 障害福祉サービス事業所に義務付けられている法定研修（年1回以上・訓練含む）
+const LEGAL_TRAININGS=['虐待防止研修','身体拘束適正化研修','感染症・BCP研修（訓練含む）','個人情報保護研修'];
+// 4月始まりの年度（例：2026-03-31 → 2025年度）
+const fiscalYear=(d)=>{if(!d)return null;const dt=new Date(d);if(isNaN(dt))return null;return (dt.getMonth()+1)>=4?dt.getFullYear():dt.getFullYear()-1;};
+const daysUntil=(d)=>{if(!d)return null;const diff=(new Date(d)-new Date())/(1000*60*60*24);return isNaN(diff)?null:Math.floor(diff);};
+
+function ContractStatusBadge({status}){
+  const c={'準備中':'b-gy','送信済':'b-bl','締結済':'b-gn','更新要':'b-rd'};
+  return <span className={`badge ${c[status]||'b-gy'}`}>{status}</span>;
+}
+
+function ContractsTraining({contracts,setContracts,training,setTraining,staff}){
+  const [activeTab,setActiveTab]=useState('contract');
+  // ---- 契約・署名管理 ----
+  const [cModal,setCModal]=useState(false);
+  const [cEdit,setCEdit]=useState(null);
+  const CEMPTY={id:'',category:'利用者契約',party:'',method:'クラウドサイン',status:'準備中',signedDate:'',renewalDate:'',memo:''};
+  const [cForm,setCForm]=useState(CEMPTY);
+  const setCF=(k,v)=>setCForm(f=>({...f,[k]:v}));
+  const [fCat,setFCat]=useState('すべて');
+  const [fSt,setFSt]=useState('すべて');
+  const saveContract=()=>{
+    if(!cForm.party.trim())return alert('相手方名を入力してください');
+    const rec={...cForm,id:cEdit||genId()};
+    const updated=cEdit?contracts.map(c=>c.id===cEdit?rec:c):[...contracts,rec];
+    setContracts(updated);ss('ruminasu_contracts',updated);setCModal(false);
+  };
+  const delContract=(id)=>{if(!window.confirm('削除しますか？'))return;const u=contracts.filter(c=>c.id!==id);setContracts(u);ss('ruminasu_contracts',u);};
+  const filteredC=contracts.filter(c=>(fCat==='すべて'||c.category===fCat)&&(fSt==='すべて'||c.status===fSt));
+  const renewExpired=contracts.filter(c=>{const d=daysUntil(c.renewalDate);return d!==null&&d<0;});
+  const renewSoon=contracts.filter(c=>{const d=daysUntil(c.renewalDate);return d!==null&&d>=0&&d<30;});
+  // ---- 研修管理 ----
+  const [tModal,setTModal]=useState(false);
+  const [tEdit,setTEdit]=useState(null);
+  const TEMPTY={id:'',staffName:'',title:'',format:'eラーニング',url:'',plannedDate:today(),doneDate:'',hours:1,careerPath2:false,memo:''};
+  const [tForm,setTForm]=useState(TEMPTY);
+  const setTF=(k,v)=>setTForm(f=>({...f,[k]:v}));
+  const [tplModal,setTplModal]=useState(false);
+  const [tplStaff,setTplStaff]=useState('');
+  const [tplDate,setTplDate]=useState(today());
+  const saveTraining=()=>{
+    if(!tForm.staffName.trim()||!tForm.title.trim())return alert('職員名と研修名を入力してください');
+    const rec={...tForm,hours:parseFloat(tForm.hours)||0,id:tEdit||genId()};
+    const updated=tEdit?training.map(t=>t.id===tEdit?rec:t):[...training,rec];
+    setTraining(updated);ss('ruminasu_training',updated);setTModal(false);
+  };
+  const delTraining=(id)=>{if(!window.confirm('削除しますか？'))return;const u=training.filter(t=>t.id!==id);setTraining(u);ss('ruminasu_training',u);};
+  const addTemplates=()=>{
+    if(!tplStaff.trim())return alert('職員名を選択または入力してください');
+    const recs=LEGAL_TRAININGS.map(title=>({id:genId(),staffName:tplStaff.trim(),title,format:'法定研修',url:'',plannedDate:tplDate,doneDate:'',hours:1,careerPath2:true,memo:'法定研修テンプレから一括追加'}));
+    const updated=[...training,...recs];
+    setTraining(updated);ss('ruminasu_training',updated);setTplModal(false);
+    alert(`${tplStaff.trim()} さんの法定研修 ${recs.length}件を予定として追加しました`);
+  };
+  const overdue=training.filter(t=>!t.doneDate&&t.plannedDate&&t.plannedDate<today());
+  // 職員×年度の受講時間集計（修了済み＝修了日あり／予定＝修了日なし）
+  const aggMap={};
+  training.forEach(t=>{
+    const fy=fiscalYear(t.doneDate||t.plannedDate);
+    if(fy===null||!t.staffName)return;
+    const key=t.staffName+'|'+fy;
+    aggMap[key]=aggMap[key]||{staffName:t.staffName,fy,done:0,planned:0,cnt:0,cp2:0};
+    const h=parseFloat(t.hours)||0;
+    aggMap[key].cnt++;
+    if(t.doneDate){aggMap[key].done+=h;if(t.careerPath2)aggMap[key].cp2+=h;}
+    else aggMap[key].planned+=h;
+  });
+  const aggRows=Object.values(aggMap).sort((a,b)=>b.fy-a.fy||a.staffName.localeCompare(b.staffName,'ja'));
+  const sortedT=[...training].sort((a,b)=>(b.plannedDate||'').localeCompare(a.plannedDate||''));
+  return(
+    <div>
+      <div className="page-header">
+        <h2>📜 契約・研修管理</h2>
+        <p>契約書・同意書の締結状況と、職員研修（法定研修・キャリアパス要件Ⅱ）を管理します</p>
+      </div>
+      <div className="tabs">
+        {[['contract','📜 契約・署名管理'],['training','📚 研修管理']].map(([id,label])=>(
+          <div key={id} className={`tab${activeTab===id?' active':''}`} onClick={()=>setActiveTab(id)}>{label}</div>
+        ))}
+      </div>
+      {activeTab==='contract'&&(
+        <div>
+          {renewExpired.length>0&&(
+            <div className="alert-banner al-danger" style={{marginBottom:10}}>
+              🚨 更新期限を過ぎた契約：{renewExpired.map(c=>`${c.party}（${c.category}・期限${c.renewalDate}）`).join('、')}
+            </div>
+          )}
+          {renewSoon.length>0&&(
+            <div className="alert-banner al-warn" style={{marginBottom:10}}>
+              ⚠️ 更新期限が30日以内の契約：{renewSoon.map(c=>`${c.party}（${c.category}・期限${c.renewalDate}）`).join('、')}
+            </div>
+          )}
+          <div className="action-bar">
+            <div style={{display:'flex',alignItems:'center',gap:8,flexWrap:'wrap'}}>
+              <select className="search-input" value={fCat} onChange={e=>setFCat(e.target.value)}>
+                <option>すべて</option>{CONTRACT_CATS.map(c=><option key={c}>{c}</option>)}
+              </select>
+              <select className="search-input" value={fSt} onChange={e=>setFSt(e.target.value)}>
+                <option>すべて</option>{CONTRACT_STATUS.map(s=><option key={s}>{s}</option>)}
+              </select>
+              <span style={{fontSize:13,fontWeight:600}}>{filteredC.length}件 / 全{contracts.length}件</span>
+            </div>
+            <button className="btn btn-primary" onClick={()=>{setCForm(CEMPTY);setCEdit(null);setCModal(true);}}>＋ 契約を追加</button>
+          </div>
+          <div className="card">
+            <div className="table-wrap">
+              <table>
+                <thead><tr><th>区分</th><th>相手方名</th><th>締結方式</th><th>状態</th><th>締結日</th><th>更新期限</th><th>メモ</th><th>操作</th></tr></thead>
+                <tbody>
+                  {filteredC.length===0?<tr><td colSpan={8}><div className="empty-state"><div className="empty-icon">📜</div><p>契約が登録されていません</p></div></td></tr>
+                  :filteredC.map(c=>{
+                    const d=daysUntil(c.renewalDate);
+                    return(
+                      <tr key={c.id}>
+                        <td><span className="tag">{c.category}</span></td>
+                        <td style={{fontWeight:700}}>{c.party}</td>
+                        <td style={{fontSize:12}}>{c.method}</td>
+                        <td><ContractStatusBadge status={c.status}/></td>
+                        <td style={{fontSize:12}}>{c.signedDate||'—'}</td>
+                        <td>
+                          {c.renewalDate?(
+                            <span style={{fontSize:12,fontWeight:d!==null&&d<30?700:400,color:d!==null&&d<0?'var(--rd)':d!==null&&d<30?'#B7770D':'var(--gn)'}}>
+                              {c.renewalDate}{d!==null&&d<0?' ⚠️期限切れ':d!==null&&d<30?' ⚠️30日以内':''}
+                            </span>
+                          ):'—'}
+                        </td>
+                        <td style={{fontSize:12,maxWidth:220,whiteSpace:'normal'}}>{c.memo}</td>
+                        <td><div style={{display:'flex',gap:5}}>
+                          <button className="btn btn-outline btn-xs" onClick={()=>{setCForm({...c});setCEdit(c.id);setCModal(true);}}>編集</button>
+                          <button className="btn btn-ghost btn-xs" style={{color:'var(--rd)'}} onClick={()=>delContract(c.id)}>削除</button>
+                        </div></td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      )}
+      {activeTab==='training'&&(
+        <div>
+          {overdue.length>0&&(
+            <div className="alert-banner al-warn" style={{marginBottom:10}}>
+              ⚠️ 予定日を過ぎて未修了の研修：{overdue.map(t=>`${t.staffName}「${t.title}」（予定${t.plannedDate}）`).join('、')}
+            </div>
+          )}
+          <div className="action-bar">
+            <span style={{fontSize:13,fontWeight:600}}>研修 {training.length}件（未修了 {training.filter(t=>!t.doneDate).length}件）</span>
+            <div style={{display:'flex',gap:8}}>
+              <button className="btn btn-outline" onClick={()=>{setTplStaff(staff.length>0?staff[0].name:'');setTplDate(today());setTplModal(true);}}>📋 法定研修テンプレ一括追加</button>
+              <button className="btn btn-primary" onClick={()=>{setTForm(TEMPTY);setTEdit(null);setTModal(true);}}>＋ 研修を追加</button>
+            </div>
+          </div>
+          {aggRows.length>0&&(
+            <div className="card" style={{marginBottom:14}}>
+              <div className="section-title">📊 職員別・年度別 受講時間集計（年度＝4月〜翌3月）</div>
+              <div className="table-wrap">
+                <table>
+                  <thead><tr><th>職員名</th><th>年度</th><th>件数</th><th>修了時間</th><th>予定（未修了）時間</th><th>うちキャリアパス要件Ⅱ対応（修了分）</th></tr></thead>
+                  <tbody>
+                    {aggRows.map(r=>(
+                      <tr key={r.staffName+r.fy}>
+                        <td style={{fontWeight:700}}>{r.staffName}</td>
+                        <td><span className="tag">{r.fy}年度</span></td>
+                        <td>{r.cnt}件</td>
+                        <td style={{fontWeight:700,color:'var(--gn)'}}>{r.done.toFixed(1)}時間</td>
+                        <td style={{color:r.planned>0?'#B7770D':'#888'}}>{r.planned>0?r.planned.toFixed(1)+'時間':'—'}</td>
+                        <td style={{color:'var(--pu)',fontWeight:600}}>{r.cp2>0?r.cp2.toFixed(1)+'時間':'—'}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          )}
+          <div className="card">
+            <div className="table-wrap">
+              <table>
+                <thead><tr><th>職員名</th><th>研修名</th><th>形式</th><th>予定日</th><th>修了日</th><th>時間数</th><th>要件Ⅱ</th><th>メモ</th><th>操作</th></tr></thead>
+                <tbody>
+                  {sortedT.length===0?<tr><td colSpan={9}><div className="empty-state"><div className="empty-icon">📚</div><p>研修が登録されていません。「法定研修テンプレ一括追加」から始められます</p></div></td></tr>
+                  :sortedT.map(t=>{
+                    const late=!t.doneDate&&t.plannedDate&&t.plannedDate<today();
+                    return(
+                      <tr key={t.id}>
+                        <td style={{fontWeight:700}}>{t.staffName}</td>
+                        <td>
+                          <div style={{fontWeight:600}}>{t.title}</div>
+                          {t.url&&<a href={t.url} target="_blank" rel="noreferrer" style={{fontSize:11,color:'var(--bl)'}}>🔗 教材リンク</a>}
+                        </td>
+                        <td><span className={`badge ${t.format==='法定研修'?'b-pu':'b-gy'}`}>{t.format}</span></td>
+                        <td style={{fontSize:12,color:late?'var(--rd)':'inherit',fontWeight:late?700:400}}>{t.plannedDate||'—'}{late&&' ⚠️'}</td>
+                        <td>{t.doneDate?<span className="badge b-gn">✅ {t.doneDate}</span>:<span className="badge b-yw">未修了</span>}</td>
+                        <td style={{fontWeight:600}}>{(parseFloat(t.hours)||0).toFixed(1)}h</td>
+                        <td>{t.careerPath2?<span className="badge b-pu">Ⅱ対応</span>:'—'}</td>
+                        <td style={{fontSize:12,maxWidth:180,whiteSpace:'normal'}}>{t.memo}</td>
+                        <td><div style={{display:'flex',gap:5}}>
+                          {!t.doneDate&&<button className="btn btn-success btn-xs" onClick={()=>{const u=training.map(x=>x.id===t.id?{...x,doneDate:today()}:x);setTraining(u);ss('ruminasu_training',u);}}>修了</button>}
+                          <button className="btn btn-outline btn-xs" onClick={()=>{setTForm({...t});setTEdit(t.id);setTModal(true);}}>編集</button>
+                          <button className="btn btn-ghost btn-xs" style={{color:'var(--rd)'}} onClick={()=>delTraining(t.id)}>削除</button>
+                        </div></td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      )}
+      {cModal&&(
+        <Modal title={cEdit?'契約を編集':'契約を追加'} onClose={()=>setCModal(false)}>
+          <div className="fr2">
+            <div className="fg"><label>区分 *</label><select className="fc" value={cForm.category} onChange={e=>setCF('category',e.target.value)}>{CONTRACT_CATS.map(c=><option key={c}>{c}</option>)}</select></div>
+            <div className="fg"><label>相手方名 *</label><input className="fc" value={cForm.party} onChange={e=>setCF('party',e.target.value)} placeholder="例：利用者○○様／職員○○"/></div>
+          </div>
+          <div className="fr2">
+            <div className="fg"><label>締結方式</label><select className="fc" value={cForm.method} onChange={e=>setCF('method',e.target.value)}>{CONTRACT_METHODS.map(m=><option key={m}>{m}</option>)}</select></div>
+            <div className="fg"><label>状態</label><select className="fc" value={cForm.status} onChange={e=>setCF('status',e.target.value)}>{CONTRACT_STATUS.map(s=><option key={s}>{s}</option>)}</select></div>
+          </div>
+          <div className="fr2">
+            <div className="fg"><label>締結日</label><input type="date" className="fc" value={cForm.signedDate} onChange={e=>setCF('signedDate',e.target.value)}/></div>
+            <div className="fg"><label>更新期限（任意）</label><input type="date" className="fc" value={cForm.renewalDate} onChange={e=>setCF('renewalDate',e.target.value)}/></div>
+          </div>
+          <div className="fg"><label>メモ（クラウドサイン文書名・保管場所など）</label><textarea className="fc" rows={2} value={cForm.memo} onChange={e=>setCF('memo',e.target.value)} placeholder="例：クラウドサイン「居宅介護契約書_○○様」／原本は事務所キャビネット"/></div>
+          <div className="modal-ftr">
+            <button className="btn btn-ghost" onClick={()=>setCModal(false)}>キャンセル</button>
+            <button className="btn btn-primary" onClick={saveContract}>💾 保存する</button>
+          </div>
+        </Modal>
+      )}
+      {tModal&&(
+        <Modal title={tEdit?'研修を編集':'研修を追加'} onClose={()=>setTModal(false)}>
+          <div className="fr2">
+            <div className="fg"><label>職員名 *</label>
+              <input className="fc" list="ct-staff-list" value={tForm.staffName} onChange={e=>setTF('staffName',e.target.value)} placeholder="スタッフ名を選択または入力"/>
+              <datalist id="ct-staff-list">{staff.map(s=><option key={s.id} value={s.name}/>)}</datalist>
+            </div>
+            <div className="fg"><label>研修名 *</label><input className="fc" value={tForm.title} onChange={e=>setTF('title',e.target.value)} placeholder="例：虐待防止研修"/></div>
+          </div>
+          <div className="fr2">
+            <div className="fg"><label>形式</label><select className="fc" value={tForm.format} onChange={e=>setTF('format',e.target.value)}>{TRAIN_FORMATS.map(f=><option key={f}>{f}</option>)}</select></div>
+            <div className="fg"><label>URL（任意）</label><input className="fc" value={tForm.url} onChange={e=>setTF('url',e.target.value)} placeholder="https://..."/></div>
+          </div>
+          <div className="fr3">
+            <div className="fg"><label>予定日</label><input type="date" className="fc" value={tForm.plannedDate} onChange={e=>setTF('plannedDate',e.target.value)}/></div>
+            <div className="fg"><label>修了日（未修了なら空欄）</label><input type="date" className="fc" value={tForm.doneDate} onChange={e=>setTF('doneDate',e.target.value)}/></div>
+            <div className="fg"><label>時間数</label><input type="number" min="0" step="0.5" className="fc" value={tForm.hours} onChange={e=>setTF('hours',e.target.value)}/></div>
+          </div>
+          <div className="fg">
+            <label style={{display:'flex',alignItems:'center',gap:8,cursor:'pointer'}}>
+              <input type="checkbox" checked={!!tForm.careerPath2} onChange={e=>setTF('careerPath2',e.target.checked)}/>
+              キャリアパス要件Ⅱ対応（処遇改善加算の研修実施要件の記録として使う）
+            </label>
+          </div>
+          <div className="fg"><label>メモ</label><textarea className="fc" rows={2} value={tForm.memo} onChange={e=>setTF('memo',e.target.value)}/></div>
+          <div className="modal-ftr">
+            <button className="btn btn-ghost" onClick={()=>setTModal(false)}>キャンセル</button>
+            <button className="btn btn-primary" onClick={saveTraining}>💾 保存する</button>
+          </div>
+        </Modal>
+      )}
+      {tplModal&&(
+        <Modal title="法定研修テンプレを一括追加" onClose={()=>setTplModal(false)}>
+          <div className="notice n-info" style={{marginBottom:12}}>
+            以下の4つの法定研修を、選択した職員の「予定」としてまとめて追加します（形式：法定研修／各1時間・キャリアパス要件Ⅱ対応。追加後に個別に編集できます）。
+          </div>
+          <ul style={{margin:'0 0 14px 20px',fontSize:13,lineHeight:1.9}}>
+            {LEGAL_TRAININGS.map(t=><li key={t}>{t}</li>)}
+          </ul>
+          <div className="fr2">
+            <div className="fg"><label>職員名 *</label>
+              <input className="fc" list="ct-staff-list2" value={tplStaff} onChange={e=>setTplStaff(e.target.value)} placeholder="スタッフ名を選択または入力"/>
+              <datalist id="ct-staff-list2">{staff.map(s=><option key={s.id} value={s.name}/>)}</datalist>
+            </div>
+            <div className="fg"><label>予定日</label><input type="date" className="fc" value={tplDate} onChange={e=>setTplDate(e.target.value)}/></div>
+          </div>
+          <div className="modal-ftr">
+            <button className="btn btn-ghost" onClick={()=>setTplModal(false)}>キャンセル</button>
+            <button className="btn btn-primary" onClick={addTemplates}>📋 4件を一括追加する</button>
+          </div>
+        </Modal>
+      )}
+    </div>
+  );
+}
+
+// ===== APP =====
+// ===== Claude API クライアント（ブラウザ直接呼び出し） =====
+const AI_KEY_LS='ruminasu_apiKey';
+const getApiKey=()=>{try{return localStorage.getItem(AI_KEY_LS)||''}catch{return ''}};
+// 選択可能なモデルと概算料金（USD / 100万トークンあたり）。※料金は目安。最新はconsole.anthropic.comで確認。
+const AI_MODELS=[
+  {id:'claude-fable-5',name:'Fable 5（最上位）',inUSD:10,outUSD:50},
+  {id:'claude-opus-4-8',name:'Opus 4.8（高性能）',inUSD:5,outUSD:25},
+  {id:'claude-sonnet-4-6',name:'Sonnet 4.6（標準）',inUSD:3,outUSD:15},
+  {id:'claude-haiku-4-5-20251001',name:'Haiku 4.5（高速・低コスト）',inUSD:1,outUSD:5},
+];
+const AI_MODEL_LS='ruminasu_aiModel';
+const USD_JPY=155; // 円換算レート（概算）
+const getModel=()=>{try{const m=localStorage.getItem(AI_MODEL_LS);return AI_MODELS.some(x=>x.id===m)?m:AI_MODELS[0].id;}catch{return AI_MODELS[0].id;}};
+const modelInfo=(id)=>AI_MODELS.find(x=>x.id===id)||AI_MODELS[0];
+// 使用量（月別トークン累計）
+const AI_USAGE_LS='ruminasu_aiUsage';
+const getUsage=()=>{try{return JSON.parse(localStorage.getItem(AI_USAGE_LS)||'{}');}catch{return {};}};
+const addUsage=(model,inTok,outTok)=>{try{
+  const u=getUsage();const m=curM();u[m]=u[m]||{};u[m][model]=u[m][model]||{in:0,out:0};
+  u[m][model].in+=inTok||0;u[m][model].out+=outTok||0;localStorage.setItem(AI_USAGE_LS,JSON.stringify(u));
+}catch{}};
+const monthCostJPY=(u,m)=>{const mm=u[m]||{};return Object.entries(mm).reduce((s,[mid,t])=>{
+  const p=modelInfo(mid);return s+((t.in/1e6)*p.inUSD+(t.out/1e6)*p.outUSD)*USD_JPY;},0);};
+// 月次予算（円。0=無制限）
+const AI_BUDGET_LS='ruminasu_aiBudget';
+const getBudget=()=>{try{return parseInt(localStorage.getItem(AI_BUDGET_LS))||0;}catch{return 0;}};
+// 会話履歴の保存
+const AI_CHAT_LS='ruminasu_aiChat';
+
+// アプリ内データを要約してシステムプロンプトに埋め込む
+// 連番の仮名を作る（利用者A, 利用者B… / スタッフA…）
+const pseudo=(prefix,i)=>prefix+(i<26?String.fromCharCode(65+i):('#'+(i+1)));
+function buildAISystem({residents,careRecords,staff,kasan,acct},opts){
+  const anon=!opts||opts.anonymize!==false; // 既定は匿名化ON（要配慮個人情報の保護）
+  // 実名→仮名の対応表（サービス記録などの名前照合に使う）
+  const resMap={},staffMap={};
+  (residents||[]).forEach((r,i)=>{if(r.name)resMap[r.name]=pseudo('利用者',i);});
+  (staff||[]).forEach((s,i)=>{if(s.name)staffMap[s.name]=pseudo('スタッフ',i);});
+  const rn=(name)=>!name?'-':(anon?(resMap[name]||'利用者?'):name);
+  const sn=(name)=>!name?'-':(anon?(staffMap[name]||'スタッフ?'):name);
+  const resLines=(residents||[]).map((r,i)=>
+    `・${anon?pseudo('利用者',i):r.name}（${r.supportLevel||'-'}／${r.serviceType||'-'}／月${r.serviceHours||0}時間）期限${r.certExpiry||'-'} 上限${yen(r.copayLimit||0)}${r.isNew?' [新規]':''}`).join('\n');
+  const staffLines=(staff||[]).map((s,i)=>
+    `・${anon?pseudo('スタッフ',i):s.name}（${s.role||'-'}／${s.employment||'-'}）資格:${(s.qualifications||[]).join('・')||'なし'}`).join('\n');
+  const kLines=Object.entries(kasan||{}).map(([k,v])=>{
+    const def=KASAN_DEF[k];const nm=def?def.name:k;
+    return `・${nm}: ${v.enabled?('適用'+(v.level?'（'+v.level+'）':'')):'未適用'}`;}).join('\n');
+  const billLines=(KK_BILLING.months||[]).map(m=>`・${m.label}: 請求額${yen(m.totalService)}／単位${m.totalUnits}`).join('\n');
+  // サービス記録は直近30件まで（コンテキスト肥大を防ぐ）
+  const recs=[...(careRecords||[])].sort((a,b)=>(b.date||'').localeCompare(a.date||''));
+  const recLines=recs.slice(0,30).map(r=>
+    `・${r.date} ${rn(r.residentName)}／${r.serviceType||'-'}・${r.category||'-'} ${r.startTime||''}-${r.endTime||''} 担当:${sn(r.staffName)} 内容:${(r.content||'').replace(/\n/g,' ')}${r.notes?('　備考:'+r.notes.replace(/\n/g,' ')):''}`).join('\n');
+  const recNote=recs.length>30?`\n（他 ${recs.length-30} 件は省略）`:'';
+  // 経理は直近3か月のP&L
+  const acctLines=Object.keys(acct||{}).sort().slice(-3).map(m=>{
+    const d=acct[m];const inc=Object.values(d.income||{}).reduce((s,v)=>s+(+v||0),0);
+    const exp=Object.values(d.expense||{}).reduce((s,v)=>s+(+v||0),0);
+    return `・${m}: 収入${yen(inc)}／支出${yen(exp)}／損益${yen(inc-exp)}`;}).join('\n');
+  const privacyNote=anon
+    ?'※プライバシー保護のため、利用者・スタッフは「利用者A」「スタッフB」等の仮名で表しています。回答でも実名は使わずこの仮名で言及してください。受給者証番号は共有していません。'
+    :'※利用者の実名を含みます。受給者証番号は共有していません。';
+  return `あなたは北海道札幌市の障がい福祉サービス事業所「るみなす」の業務を支援するAIアシスタントです。
+運営サービス: 居宅介護・重度訪問介護・移動支援。単位単価=${UNIT_PRICE}円（令和6年度改定レート適用）。
+回答は日本語で、介護事業所の実務担当者にわかりやすく、簡潔かつ正確に。制度・加算・請求の一般論を述べる際は確実な範囲で答え、最終判断は国保連・自治体・かんたん介護ソフトの公式情報で確認するよう促してください。不確かな点は推測せず「要確認」と明示してください。
+${privacyNote}
+
+【現在の利用者（${(residents||[]).length}名）】
+${resLines||'（なし）'}
+
+【スタッフ（${(staff||[]).length}名）】
+${staffLines||'（なし）'}
+
+【加算設定】
+${kLines||'（なし）'}
+
+【サービス記録（直近30件）】
+${recLines||'（未登録）'}${recNote}
+
+【月次収支（直近3か月）】
+${acctLines||'（なし）'}
+
+【かんたん介護ソフト 連携済み請求実績】
+${billLines||'（なし）'}`;
+}
+
+// SSEストリーミングでClaude APIを呼ぶ。onTextに差分テキストが渡る。
+async function streamClaude({system,messages,onText,maxTokens=4096,signal}){
+  const key=getApiKey();
+  if(!key)throw new Error('APIキーが未設定です。設定タブで入力してください。');
+  const model=getModel();
+  const resp=await fetch('https://api.anthropic.com/v1/messages',{
+    method:'POST',signal,
+    headers:{
+      'content-type':'application/json',
+      'x-api-key':key,
+      'anthropic-version':'2023-06-01',
+      'anthropic-dangerous-direct-browser-access':'true',
+    },
+    body:JSON.stringify({model,max_tokens:maxTokens,stream:true,system,messages}),
+  });
+  if(!resp.ok){
+    let msg='APIエラー ('+resp.status+')';
+    try{const e=await resp.json();if(e&&e.error&&e.error.message)msg=e.error.message;}catch{}
+    if(resp.status===401)msg='APIキーが無効です。設定タブで正しいキーを入力してください。';
+    throw new Error(msg);
+  }
+  const reader=resp.body.getReader();const dec=new TextDecoder();let buf='';let full='';
+  let inTok=0,outTok=0;
+  const record=()=>{if(inTok||outTok)addUsage(model,inTok,outTok);};
+  try{
+    while(true){
+      const {done,value}=await reader.read();if(done)break;
+      buf+=dec.decode(value,{stream:true});
+      let idx;
+      while((idx=buf.indexOf('\n'))>=0){
+        const line=buf.slice(0,idx).trim();buf=buf.slice(idx+1);
+        if(!line.startsWith('data:'))continue;
+        const data=line.slice(5).trim();if(!data)continue;
+        try{
+          const j=JSON.parse(data);
+          if(j.type==='message_start'&&j.message&&j.message.usage){inTok=j.message.usage.input_tokens||0;}
+          else if(j.type==='content_block_delta'&&j.delta&&j.delta.type==='text_delta'){
+            full+=j.delta.text;onText&&onText(j.delta.text);
+          }
+          else if(j.type==='message_delta'&&j.usage){outTok=j.usage.output_tokens||outTok;}
+        }catch{}
+      }
+    }
+  }catch(e){record();throw e;} // 中断時も計測済み分は記録
+  record();
+  return full;
+}
+
+const AI_QUICK=[
+  {id:'kasan',label:'⚡ 加算シミュレーター解説',
+   prompt:'現在の加算設定を確認し、各利用者について適用中の加算と要件の過不足、増収の余地、改善提案を整理してください。要件を満たせていない可能性がある場合は具体的に指摘してください。'},
+  {id:'summary',label:'📝 サービス記録の要約',
+   prompt:'登録されているサービス記録（ケア記録）をもとに、月次まとめ・実績報告の下書きを作成してください。記録が未登録の場合は、どのような項目を記録すべきかのテンプレートを提案してください。'},
+  {id:'billing',label:'🏛️ 請求前チェック',
+   prompt:'請求業務の前提として、利用者の受給者証の有効期限・上限額管理、連携済み請求実績の整合性を点検し、リスクや漏れ・要注意点を箇条書きで指摘してください。'},
+];
+
+// 軽量Markdown→HTML（見出し・箇条書き・番号・太字・コードのみ対応）
+function mdToHtml(src){
+  const esc=(s)=>s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  const inline=(s)=>esc(s)
+    .replace(/\*\*([^*]+)\*\*/g,'<strong>$1</strong>')
+    .replace(/`([^`]+)`/g,'<code>$1</code>');
+  const lines=(src||'').split('\n');let html='';let list=null;
+  const closeList=()=>{if(list){html+='</'+list+'>';list=null;}};
+  for(const raw of lines){
+    const line=raw.replace(/\s+$/,'');
+    let m;
+    if((m=line.match(/^\s*#{1,3}\s+(.*)$/))){closeList();html+='<div class="md-h">'+inline(m[1])+'</div>';continue;}
+    if((m=line.match(/^\s*(?:[-*・]|•)\s+(.*)$/))){if(list!=='ul'){closeList();list='ul';html+='<ul>';}html+='<li>'+inline(m[1])+'</li>';continue;}
+    if((m=line.match(/^\s*\d+[.)]\s+(.*)$/))){if(list!=='ol'){closeList();list='ol';html+='<ol>';}html+='<li>'+inline(m[1])+'</li>';continue;}
+    if(line.trim()===''){closeList();html+='<div class="md-sp"></div>';continue;}
+    closeList();html+='<div>'+inline(line)+'</div>';
+  }
+  closeList();return html;
+}
+
+function AIAssistant(props){
+  const {careRecords}=props;
+  const [tab,setTab]=useState('chat');
+  const [apiKey,setApiKey]=useState(()=>getApiKey());
+  const [keyInput,setKeyInput]=useState(()=>getApiKey());
+  const [msgs,setMsgs]=useState(()=>{try{return JSON.parse(localStorage.getItem(AI_CHAT_LS)||'[]');}catch{return [];}}); // {role,content}
+  const [input,setInput]=useState('');
+  const [busy,setBusy]=useState(false);
+  const [stream,setStream]=useState('');
+  const [err,setErr]=useState('');
+  const [anon,setAnon]=useState(()=>{try{return localStorage.getItem('ruminasu_aiAnon')!=='0';}catch{return true;}});
+  const [model,setModel]=useState(()=>getModel());
+  const [budget,setBudget]=useState(()=>getBudget());
+  const [usageTick,setUsageTick]=useState(0); // 使用量表示の再計算トリガ
+  const scrollRef=React.useRef(null);
+  const abortRef=React.useRef(null);
+  const sys=useMemo(()=>buildAISystem(props,{anonymize:anon}),[props.residents,props.staff,props.kasan,props.careRecords,props.acct,anon]);
+  const spentJPY=useMemo(()=>monthCostJPY(getUsage(),curM()),[usageTick]);
+
+  React.useEffect(()=>{if(scrollRef.current)scrollRef.current.scrollTop=scrollRef.current.scrollHeight;},[msgs,stream]);
+  React.useEffect(()=>{try{localStorage.setItem(AI_CHAT_LS,JSON.stringify(msgs));}catch{}},[msgs]);
+
+  const saveKey=()=>{const k=keyInput.trim();try{localStorage.setItem(AI_KEY_LS,k);}catch{}setApiKey(k);setErr(k?'':'');if(k)setTab('chat');};
+  const clearKey=()=>{try{localStorage.removeItem(AI_KEY_LS);}catch{}setApiKey('');setKeyInput('');};
+  const toggleAnon=()=>{setAnon(v=>{const nv=!v;try{localStorage.setItem('ruminasu_aiAnon',nv?'1':'0');}catch{}return nv;});};
+  const changeModel=(id)=>{setModel(id);try{localStorage.setItem(AI_MODEL_LS,id);}catch{}};
+  const changeBudget=(v)=>{const n=Math.max(0,parseInt(v)||0);setBudget(n);try{localStorage.setItem(AI_BUDGET_LS,String(n));}catch{}};
+  const clearChat=()=>{setMsgs([]);setErr('');try{localStorage.removeItem(AI_CHAT_LS);}catch{}};
+  const stop=()=>{if(abortRef.current)abortRef.current.abort();};
+
+  async function send(text){
+    const content=(text!=null?text:input).trim();
+    if(!content||busy)return;
+    // 月次予算チェック（0=無制限）
+    if(budget>0){
+      const spent=monthCostJPY(getUsage(),curM());
+      if(spent>=budget&&!window.confirm(`今月のAI利用概算額が予算（${yen(budget)}）に達しています（概算 ${yen(spent)}）。続行しますか？`))return;
+    }
+    setErr('');setInput('');
+    const next=[...msgs,{role:'user',content}];
+    setMsgs(next);setBusy(true);setStream('');
+    const ctrl=new AbortController();abortRef.current=ctrl;
+    let acc='';
+    try{
+      const full=await streamClaude({
+        system:sys,
+        messages:next.map(m=>({role:m.role,content:m.content})),
+        onText:(t)=>{acc+=t;setStream(acc);},
+        signal:ctrl.signal,
+      });
+      setMsgs([...next,{role:'assistant',content:full||acc}]);
+    }catch(e){
+      if(e.name==='AbortError'){
+        if(acc)setMsgs([...next,{role:'assistant',content:acc+'\n\n（中断しました）'}]);
+      }else{
+        setErr(e.message||'通信に失敗しました');
+      }
+    }finally{setBusy(false);setStream('');abortRef.current=null;setUsageTick(t=>t+1);}
+  }
+
+  if(!apiKey){
+    return(
+      <div>
+        <div className="page-header"><h2>🤖 AIアシスタント</h2><p>Claude Fable 5 による業務支援</p></div>
+        <div className="ai-setup">
+          <div className="card">
+            <div className="notice n-info" style={{marginBottom:14}}>
+              利用には Anthropic の API キーが必要です。キーは <b>このブラウザ内（localStorage）にのみ保存</b>され、ファイルやコードには書き込まれません。<br/>
+              ⚠️ このファイルを他人と共有する場合は、必ず設定タブからキーを削除してください。
+            </div>
+            <div className="fg">
+              <label>Anthropic API キー（sk-ant-... ）</label>
+              <input className="fc" type="password" value={keyInput} placeholder="sk-ant-..."
+                onChange={e=>setKeyInput(e.target.value)} />
+            </div>
+            <button className="btn btn-primary" onClick={saveKey} disabled={!keyInput.trim()}>保存して開始</button>
+            <p style={{fontSize:11,color:'var(--tl)',marginTop:12}}>
+              APIキーは <a href="https://console.anthropic.com/settings/keys" target="_blank" rel="noopener" style={{color:'var(--or)'}}>console.anthropic.com</a> で発行できます。既定モデル: <b>Fable 5</b>（保存後に設定タブで変更可）
+            </p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  return(
+    <div>
+      <div className="page-header"><h2>🤖 AIアシスタント</h2><p>{modelInfo(model).name} — 利用者・加算・請求データを踏まえて回答します {anon?<span className="badge b-gn" style={{marginLeft:4}}>🔒 匿名化ON</span>:<span className="badge b-rd" style={{marginLeft:4}}>実名送信</span>} <span className="badge b-gy" style={{marginLeft:4}}>今月概算 {yen(spentJPY)}{budget>0?' / '+yen(budget):''}</span></p></div>
+      <div className="tabs">
+        <div className={`tab${tab==='chat'?' active':''}`} onClick={()=>setTab('chat')}>チャット</div>
+        <div className={`tab${tab==='settings'?' active':''}`} onClick={()=>setTab('settings')}>設定</div>
+      </div>
+      {tab==='settings'?(
+        <div className="ai-setup">
+          <div className="card">
+            <div className="fg">
+              <label>Anthropic API キー</label>
+              <input className="fc" type="password" value={keyInput} placeholder="sk-ant-..."
+                onChange={e=>setKeyInput(e.target.value)} />
+            </div>
+            <div style={{display:'flex',gap:8}}>
+              <button className="btn btn-primary" onClick={saveKey} disabled={!keyInput.trim()}>保存</button>
+              <button className="btn btn-danger" onClick={clearKey}>キーを削除</button>
+            </div>
+            <div className="divider"></div>
+            <div className="toggle-wrap" onClick={toggleAnon} style={{marginBottom:6}}>
+              <div className={`toggle ${anon?'ton':''}`}/>
+              <span style={{fontSize:13,fontWeight:600}}>利用者・スタッフ名を匿名化して送信</span>
+            </div>
+            <p style={{fontSize:11.5,color:'var(--tl)',marginBottom:0}}>
+              {anon
+                ?'✅ ONの間は、実名を「利用者A」「スタッフB」等の仮名に置き換えてAIに送信します（受給者証番号は常に送信しません）。個人情報保護の観点から推奨。'
+                :'⚠️ OFFにすると利用者・スタッフの実名がAnthropicのAPIへ送信されます。障害情報は要配慮個人情報です。利用者の同意・委託先管理を確認のうえご利用ください。'}
+            </p>
+            <div className="divider"></div>
+            <div className="fg">
+              <label>利用モデル</label>
+              <select className="fc" value={model} onChange={e=>changeModel(e.target.value)}>
+                {AI_MODELS.map(m=><option key={m.id} value={m.id}>{m.name}（入力${m.inUSD}/出力${m.outUSD}・100万トークン）</option>)}
+              </select>
+            </div>
+            <div className="fg" style={{marginBottom:6}}>
+              <label>月次予算（円・0で無制限）</label>
+              <input className="fc" type="number" min="0" step="500" value={budget} onChange={e=>changeBudget(e.target.value)} style={{maxWidth:200}} />
+            </div>
+            <div className="notice n-info" style={{marginBottom:0}}>
+              今月のAI利用概算額：<b>{yen(spentJPY)}</b>{budget>0?`（予算 ${yen(budget)}）`:'（予算未設定）'}<br/>
+              <span style={{fontSize:11}}>※料金は目安（${modelInfo(model).inUSD}/${modelInfo(model).outUSD} per 100万トークン・1ドル≒{USD_JPY}円換算）。正確な請求額はconsole.anthropic.comでご確認ください。</span>
+            </div>
+            <div className="divider"></div>
+            <p style={{fontSize:12,color:'var(--tl)'}}>キーはこのブラウザ内（localStorage）にのみ保存されます。</p>
+          </div>
+        </div>
+      ):(
+        <div className="ai-wrap">
+          <div className="ai-quick">
+            {AI_QUICK.map(q=>(
+              <button key={q.id} className="ai-chip" disabled={busy} onClick={()=>send(q.prompt)}>{q.label}</button>
+            ))}
+            {msgs.length>0&&<button className="ai-chip" disabled={busy} onClick={clearChat}>🗑 クリア</button>}
+          </div>
+          <div className="ai-msgs" ref={scrollRef}>
+            {msgs.length===0&&!stream&&(
+              <div className="empty-state">
+                <div className="empty-icon">💬</div>
+                <p>加算・請求・制度の質問や、上のクイックアクションをどうぞ。</p>
+                <p style={{fontSize:11,marginTop:6}}>例：「受給者証の期限が近い利用者は？」「特定事業所加算Ⅰの要件は？」</p>
+              </div>
+            )}
+            {msgs.map((m,i)=>(
+              <div key={i} className={`ai-row ${m.role==='user'?'user':''}`}>
+                <div className={`ai-av ${m.role==='user'?'user':'bot'}`}>{m.role==='user'?'🧑':'🌿'}</div>
+                {m.role==='user'
+                  ?<div className="ai-bubble user">{m.content}</div>
+                  :<div className="ai-bubble bot" dangerouslySetInnerHTML={{__html:mdToHtml(m.content)}}/>}
+              </div>
+            ))}
+            {(busy||stream)&&(
+              <div className="ai-row">
+                <div className="ai-av bot">🌿</div>
+                <div className="ai-bubble bot"><span dangerouslySetInnerHTML={{__html:mdToHtml(stream)}}/>{busy&&<span className="ai-cursor"></span>}</div>
+              </div>
+            )}
+          </div>
+          {err&&<div className="notice n-danger" style={{marginTop:10}}>⚠️ {err}</div>}
+          <div className="ai-input-bar">
+            <textarea className="ai-input" rows={1} value={input} placeholder="メッセージを入力（Enterで送信 / Shift+Enterで改行）"
+              onChange={e=>setInput(e.target.value)}
+              onKeyDown={e=>{if(e.key==='Enter'&&!e.shiftKey&&!e.nativeEvent.isComposing&&e.keyCode!==229){e.preventDefault();send();}}} />
+            {busy
+              ?<button className="btn btn-danger" onClick={stop}>■ 停止</button>
+              :<button className="btn btn-primary" disabled={!input.trim()} onClick={()=>send()}>送信</button>}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+function App(){
+  const [page,setPage]=useState('dashboard');
+  const [residents,setResidents]=useState(()=>initD('residents',INIT_RESIDENTS));
+  const [careRecords,setCareRecords]=useState(()=>ls('careRecords',[]));
+  const [staff,setStaff]=useState(()=>initD('staff',INIT_STAFF));
+  const [shifts,setShifts]=useState(()=>ls('shifts',[]));
+  const [legalUpdates,setLegalUpdates]=useState(()=>ls('legalUpdates',[]));
+  const [kasan,setKasan]=useState(()=>migrateKasan(ls('kasanSettings',DEFAULT_KASAN)));
+  const [acct,setAcct]=useState(()=>ls('accounting',DEFAULT_ACCT));
+  // 新キーは初回アクセス時に空配列で初期化（既存キーには影響しない）
+  const [contracts,setContracts]=useState(()=>initD('ruminasu_contracts',[]));
+  const [training,setTraining]=useState(()=>initD('ruminasu_training',[]));
+  const NAV=[
+    {id:'dashboard',icon:'🏡',label:'ダッシュボード'},
+    {id:'residents',icon:'👤',label:'利用者管理'},
+    {id:'care',icon:'📝',label:'ケア記録・実績'},
+    {id:'staff',icon:'👥',label:'シフト・勤怠'},
+    {id:'kasan',icon:'⚡',label:'加算管理'},
+    {id:'billing',icon:'🏛️',label:'月次請求'},
+    {id:'accounting',icon:'💰',label:'経理管理'},
+    {id:'contract',icon:'📜',label:'契約・研修'},
+    {id:'legal',icon:'📢',label:'法令・制度更新'},
+    {id:'ai',icon:'🤖',label:'AIアシスタント'},
+  ];
+  const dangerCount=legalUpdates.filter(u=>u.type==='danger').length;
+  const certAlerts=residents.filter(r=>{if(!r.certExpiry)return false;const d=(new Date(r.certExpiry)-new Date())/(1000*60*60*24);return d<60;}).length;
+  return(
+    <div className="app">
+      <nav className="sidebar">
+        <div className="sidebar-logo">
+          <h1>🌿 るみなす</h1>
+          <p>障がい福祉統合管理システム</p>
+        </div>
+        <div className="sidebar-nav">
+          {NAV.map(n=>(
+            <div key={n.id} className={`nav-item${page===n.id?' active':''}`} onClick={()=>setPage(n.id)}>
+              <span className="nav-icon">{n.icon}</span>
+              <span>{n.label}</span>
+              {n.id==='legal'&&dangerCount>0&&<span style={{marginLeft:'auto',background:'#E74C3C',color:'white',borderRadius:9,padding:'1px 6px',fontSize:11}}>{dangerCount}</span>}
+              {n.id==='residents'&&certAlerts>0&&<span style={{marginLeft:'auto',background:'#F39C12',color:'white',borderRadius:9,padding:'1px 6px',fontSize:11}}>{certAlerts}</span>}
+            </div>
+          ))}
+        </div>
+        <div className="sidebar-footer">
+          <div style={{display:'flex',gap:6,marginBottom:10}}>
+            <button onClick={exportAllData} title="全データをJSONファイルに書き出します"
+              style={{flex:1,padding:'6px 4px',borderRadius:6,border:'1px solid rgba(255,255,255,.4)',background:'rgba(255,255,255,.15)',color:'white',fontSize:10.5,fontWeight:600,cursor:'pointer',fontFamily:'inherit'}}>💾 バックアップ</button>
+            <label title="バックアップJSONから復元します"
+              style={{flex:1,padding:'6px 4px',borderRadius:6,border:'1px solid rgba(255,255,255,.4)',background:'rgba(255,255,255,.15)',color:'white',fontSize:10.5,fontWeight:600,cursor:'pointer',textAlign:'center'}}>
+              📥 復元
+              <input type="file" accept="application/json,.json" style={{display:'none'}}
+                onChange={e=>{if(e.target.files&&e.target.files[0])importAllData(e.target.files[0]);e.target.value='';}}/>
+            </label>
+          </div>
+          <p style={{fontWeight:700,marginBottom:1}}>© るみなす</p>
+          <p>北海道札幌市 障がい福祉</p>
+          <p style={{marginTop:2}}>居宅介護・重度訪問・移動支援</p>
+        </div>
+      </nav>
+      <main className="main">
+        {page==='dashboard'&&<Dashboard residents={residents} careRecords={careRecords} staff={staff} legalUpdates={legalUpdates} kasan={kasan} acct={acct} contracts={contracts} training={training} setPage={setPage}/>}
+        {page==='residents'&&<Residents residents={residents} setResidents={setResidents}/>}
+        {page==='care'&&<CareRecords residents={residents} careRecords={careRecords} setCareRecords={setCareRecords} staff={staff}/>}
+        {page==='staff'&&<StaffShifts staff={staff} setStaff={setStaff} shifts={shifts} setShifts={setShifts}/>}
+        {page==='kasan'&&<KasanManager kasan={kasan} setKasan={setKasan} staff={staff} residents={residents}/>}
+        {page==='billing'&&<MonthlyBilling residents={residents} careRecords={careRecords} kasan={kasan}/>}
+        {page==='accounting'&&<AccountingManager acct={acct} setAcct={setAcct}/>}
+        {page==='contract'&&<ContractsTraining contracts={contracts} setContracts={setContracts} training={training} setTraining={setTraining} staff={staff}/>}
+        {page==='legal'&&<LegalUpdates legalUpdates={legalUpdates} setLegalUpdates={setLegalUpdates}/>}
+        {page==='ai'&&<AIAssistant residents={residents} careRecords={careRecords} staff={staff} shifts={shifts} kasan={kasan} acct={acct}/>}
+      </main>
+    </div>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById('root')).render(<App/>);
+</script>
+</body>
+</html>
