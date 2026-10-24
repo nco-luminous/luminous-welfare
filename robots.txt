@@ -1,3 +1,4 @@
 User-agent: *
 Allow: /
-Sitemap: https://kazmac96-commits.github.io/luminous-welfare/sitemap.xml
+Disallow: /kanri-f1caa712.html
+Sitemap: https://nco-luminous.github.io/luminous-welfare/sitemap.xml
