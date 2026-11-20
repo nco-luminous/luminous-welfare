@@ -1,4 +1,3 @@
 User-agent: *
 Allow: /
-Disallow: /kanri-f1caa712.html
 Sitemap: https://nco-luminous.github.io/luminous-welfare/sitemap.xml
